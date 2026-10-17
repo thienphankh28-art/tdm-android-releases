@@ -1,10 +1,10 @@
 {
- "versionCode": 5,
- "versionName": "0.4.0",
- "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.4.0/tdm-amg-0.4.0.apk",
- "sha256": "fae5ab713f7815b5633db89ae56bbafc2647cdb6ebbe9b6ef13303f8e42fb640",
- "size": 49551465,
- "notes": "Tab 4 — TDM Vancomycin (dạng từng bước, giống bản máy tính V.2.7.4):\n- 6 mô hình: Goti 2018, Collin 2019 và 4 mô hình chạy như Tucuxi (goti, collin, thomson, yamamoto).\n- Tiền nghiệm, Bayes hậu nghiệm, AUC hiện tại, AUC ngày TDM, AUC liều mới, Cpred dự đoán, đồ thị.\n- Lưu / tải / xóa lịch sử kết quả trên Cloud (qua cổng mã phiên).\n- Icon mới TDM.TP. Nút \"Kiểm tra bộ tính\" kiểm cả Vancomycin.",
+ "versionCode": 6,
+ "versionName": "0.5.0",
+ "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.5.0/tdm-amg-0.5.0.apk",
+ "sha256": "877c27a0cc8ec73aaa66800953e6a32616640a9d39fb3bbb0d8ee048e81bf954",
+ "size": 49552301,
+ "notes": "Tab 4 Vancomycin — thời gian truyền theo TỪNG LIỀU (giống bản máy tính tab4_vancomycin_v17.10.26):\n- Mỗi liều có Tinf riêng (nhập ở bước «Liều đã dùng»); dòng nồng độ chỉ còn Cobs + Tobs.\n- Chế độ liều mới gồm Liều – τ – Tinf mới; Cpred dự đoán dùng Tinf mới cho các liều mới, Tinf riêng cho các liều cũ.\n- Bản ghi cũ: Tinf của từng liều được suy ra từ Tinf của điểm đo như trước.\n- Công thức tính không đổi: khi mọi liều cùng Tinf, kết quả trùng hoàn toàn bản trước.",
  "required": false,
  "date": "2026-10-17"
 }
