@@ -1,1 +1,10 @@
-{"versionCode": 0, "versionName": "", "apk": "", "sha256": "", "size": 0, "notes": "", "required": false}
+{
+ "versionCode": 3,
+ "versionName": "0.3.0",
+ "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.3.0/tdm-amg-0.3.0.apk",
+ "sha256": "0bf76dd005c34274c13363fc6bc9ab20a0e0445afc711e9e4f5b59e2977a66de",
+ "size": 49213441,
+ "notes": "Bản phát hành đầu tiên (ký chính thức).\n- Tab 1 dạng từng bước: Sawchuk–Zaske và Bayesian 9 mô hình (Amikacin, Gentamicin, Tobramycin), lưu/tải Supabase.\n- Tự kiểm tra và cài bản cập nhật ngay trong app.\n- Bản thử (debug) từ nay cài thành app riêng «TDM AMG (thử)».",
+ "required": false,
+ "date": "2026-10-17"
+}
