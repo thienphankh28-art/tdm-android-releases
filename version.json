@@ -1,10 +1,10 @@
 {
- "versionCode": 3,
- "versionName": "0.3.0",
- "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.3.0/tdm-amg-0.3.0.apk",
- "sha256": "0bf76dd005c34274c13363fc6bc9ab20a0e0445afc711e9e4f5b59e2977a66de",
- "size": 49213441,
- "notes": "Bản phát hành đầu tiên (ký chính thức).\n- Tab 1 dạng từng bước: Sawchuk–Zaske và Bayesian 9 mô hình (Amikacin, Gentamicin, Tobramycin), lưu/tải Supabase.\n- Tự kiểm tra và cài bản cập nhật ngay trong app.\n- Bản thử (debug) từ nay cài thành app riêng «TDM AMG (thử)».",
+ "versionCode": 4,
+ "versionName": "0.3.1",
+ "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.3.1/tdm-amg-0.3.1.apk",
+ "sha256": "658ebc110a9d73a5a0a5673a8268696921e78e4dc322d63b5f49e74fd0a5eb8e",
+ "size": 49213165,
+ "notes": "Bảo mật dữ liệu bệnh nhân:\n- Đăng nhập nhận \"mã phiên\"; mọi thao tác đọc/ghi dữ liệu đi qua cổng kiểm tra mã phiên trên Supabase.\n- Chuẩn bị để khóa truy cập trực tiếp các bảng dữ liệu (chỉ người có tài khoản mới đọc/ghi được).\n- Phiên hết hạn sẽ tự đăng nhập lại; Đăng xuất hủy mã phiên.",
  "required": false,
  "date": "2026-10-17"
 }
