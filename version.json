@@ -1,10 +1,10 @@
 {
- "versionCode": 7,
- "versionName": "0.6.0",
- "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.6.0/tdm-amg-0.6.0.apk",
- "sha256": "2aead8c90a381db16b94bd33736520632e9cd16260870c1c5789b91fd7ca6177",
- "size": 49552885,
- "notes": "TDM AMG 0.6.0\n\nTab 4 Vancomycin\n- Thêm ô «Gộp với liều kế tiếp» ở từng điểm đo (bước Nồng độ). Đánh dấu ở mẫu ĐÁY lấy ngay trước liều N+1 để mẫu đáy và mẫu ĐỈNH sau liều N+1 được tính chung MỘT lần TDM (Goti 2018, Collin 2019 chạy chung 1 OFV). Không đánh dấu: kết quả y hệt bản 0.5.0.\n- Đánh dấu được lưu cùng hồ sơ và khôi phục khi tra cứu lại.\n- Khớp bản máy tính tab4_vancomycin_v18.10.26 + vanco_calculations_v18.10.26.",
+ "versionCode": 8,
+ "versionName": "0.7.0",
+ "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.7.0/tdm-amg-0.7.0.apk",
+ "sha256": "0778947504d5ec87e0f5270d0d6ed654c167de4f53ee64004eca3d6a25473e7c",
+ "size": 49568017,
+ "notes": "TDM AMG 0.7.0\n\nTab 1 Aminoglycosid — AUC và AUC24/MIC (cả Sawchuk–Zaske và Bayesian)\n- Bước Thông tin bệnh nhân: thêm ô MIC (mg/L). Bỏ trống/nhập sai/≤ 0 → dùng MIC mặc định 4 mg/L (có ghi chú).\n- Sawchuk–Zaske: kết quả cá thể hóa có thêm AUCτ của liều đã đo, AUC24, AUC24/MIC; bước hiệu chỉnh liều có thêm AUC24 và AUC24/MIC dự đoán ở trạng thái ổn định.\n- Bayesian: thêm AUC24 và AUC24/MIC của phác đồ hiện tại; mỗi tổ hợp liều mới có thêm AUC24 và AUC24/MIC.\n- MIC được lưu cùng hồ sơ và khôi phục khi tra cứu lại.\n- Khớp bản máy tính tab1_aminoglycosid_v19.10.26.",
  "required": false,
- "date": "2026-10-18"
+ "date": "2026-10-19"
 }
