@@ -1,10 +1,10 @@
 {
- "versionCode": 10,
- "versionName": "0.9.0",
- "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.9.0/tdm-amg-0.9.0.apk",
- "sha256": "48d9705f379d07ae6c9ede2096dcc39da2904c51d37bc8ef5eb765f385a567c4",
- "size": 49584301,
- "notes": "TDM AMG 0.9.0\n\nTính liều kháng sinh — thêm CÁCH PHA TRUYỀN\n- Dưới chế độ liều hiện cách pha truyền của thuốc đã chọn: từng mức liều/chế phẩm, dung môi, thể tích, thời gian truyền, bảo quản.\n- Dữ liệu: 37 thuốc, 137 dòng theo file của tổ Dược lâm sàng.\n- Mục mới «Tra cứu cách pha truyền»: xem cách pha của mọi thuốc trong dữ liệu (kể cả Kali clorid 10%, Methylprednisolon).",
+ "versionCode": 11,
+ "versionName": "0.9.1",
+ "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.9.1/tdm-amg-0.9.1.apk",
+ "sha256": "b62645c1e7ef86953e93896a0a1ceecd34c79232b153120f4bb02ee21af09a4e",
+ "size": 49584305,
+ "notes": "TDM AMG 0.9.1\n\n- Màn hình đăng nhập: thêm mục «Thông tin phần mềm & Bản quyền» (phiên bản, tác giả Dược sĩ Thiên Phan Tại, năm phát triển 2026, bản quyền) và «Miễn trừ trách nhiệm» — giống Tab 3 của phần mềm máy tính.",
  "required": false,
  "date": "2026-10-20"
 }
