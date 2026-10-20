@@ -1,10 +1,10 @@
 {
- "versionCode": 11,
- "versionName": "0.9.1",
- "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.9.1/tdm-amg-0.9.1.apk",
- "sha256": "b62645c1e7ef86953e93896a0a1ceecd34c79232b153120f4bb02ee21af09a4e",
- "size": 49584305,
- "notes": "TDM AMG 0.9.1\n\n- Màn hình đăng nhập: thêm mục «Thông tin phần mềm & Bản quyền» (phiên bản, tác giả Dược sĩ Thiên Phan Tại, năm phát triển 2026, bản quyền) và «Miễn trừ trách nhiệm» — giống Tab 3 của phần mềm máy tính.",
+ "versionCode": 12,
+ "versionName": "0.10.0",
+ "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.10.0/tdm-amg-0.10.0.apk",
+ "sha256": "4a84214ec4aafb7331c55d2c11d388ae61a03a5e9462ad63cd2c07abbce3da28",
+ "size": 49616449,
+ "notes": "TDM AMG 0.10.0\n\n- Tính liều kháng sinh: bảng liều và cách pha truyền nay được tải từ máy chủ sau khi đăng nhập — thuốc mới/sửa đổi hiện ngay, không cần cập nhật app.\n- Bản sao trên máy được mã hóa (khóa Android Keystore), chỉ app đọc được; mất mạng vẫn dùng bản đã lưu.\n- Tài khoản admin: thêm «Quản lý bảng liều & cách pha truyền» — thêm/sửa/xóa thuốc (người lớn / trẻ em, liều theo từng khoảng eCrCl, tính theo mg/kg có giới hạn tối đa), xem thử trước khi lưu, nhật ký sửa đổi.\n- Kết quả liều hiển thị thêm dòng eCrCl được áp dụng và ghi chú của thuốc.",
  "required": false,
  "date": "2026-10-20"
 }
