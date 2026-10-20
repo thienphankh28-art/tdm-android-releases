@@ -1,10 +1,10 @@
 {
- "versionCode": 8,
- "versionName": "0.7.0",
- "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.7.0/tdm-amg-0.7.0.apk",
- "sha256": "0778947504d5ec87e0f5270d0d6ed654c167de4f53ee64004eca3d6a25473e7c",
- "size": 49568017,
- "notes": "TDM AMG 0.7.0\n\nTab 1 Aminoglycosid — AUC và AUC24/MIC (cả Sawchuk–Zaske và Bayesian)\n- Bước Thông tin bệnh nhân: thêm ô MIC (mg/L). Bỏ trống/nhập sai/≤ 0 → dùng MIC mặc định 4 mg/L (có ghi chú).\n- Sawchuk–Zaske: kết quả cá thể hóa có thêm AUCτ của liều đã đo, AUC24, AUC24/MIC; bước hiệu chỉnh liều có thêm AUC24 và AUC24/MIC dự đoán ở trạng thái ổn định.\n- Bayesian: thêm AUC24 và AUC24/MIC của phác đồ hiện tại; mỗi tổ hợp liều mới có thêm AUC24 và AUC24/MIC.\n- MIC được lưu cùng hồ sơ và khôi phục khi tra cứu lại.\n- Khớp bản máy tính tab1_aminoglycosid_v19.10.26.",
+ "versionCode": 9,
+ "versionName": "0.8.0",
+ "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.8.0/tdm-amg-0.8.0.apk",
+ "sha256": "21781e9a1d89f25d14850a47b3d58bd08fb4b10db07f712ebcbd931ca244ffb3",
+ "size": 49585749,
+ "notes": "TDM AMG 0.8.0\n\nChức năng mới: TÍNH LIỀU KHÁNG SINH (nút ở trang chính, cần đăng nhập)\n- Nhập: giới, tuổi HOẶC năm sinh, cân nặng (kg), chiều cao (cm), SCr (chọn đơn vị µmol/L hoặc mg/dL), chọn kháng sinh.\n- Người ≥ 18 tuổi: Cockcroft–Gault (BMI, CN lý tưởng, CN hiệu chỉnh, eCrCl và khoảng eCrCl), 58 kháng sinh/kháng nấm.\n- Dưới 18 tuổi: Schwartz (tự chọn nhóm tuổi; trẻ < 1 tuổi có ô «sinh non»), 19 kháng sinh.\n- Công thức và chế độ liều giữ nguyên file Excel «Tính liều và CN thận» của tổ Dược lâm sàng (đã kiểm khớp từng ô).\n- Cảnh báo khi SCr có vẻ nhập sai đơn vị, chiều cao/cân nặng bất thường.\n- Chạy ngay trên máy, không cần mở OneDrive, không lưu dữ liệu người bệnh.\n- Mục «Cách pha truyền» sẽ được bổ sung ở bản sau.",
  "required": false,
- "date": "2026-10-19"
+ "date": "2026-10-20"
 }
