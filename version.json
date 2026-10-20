@@ -1,10 +1,10 @@
 {
- "versionCode": 9,
- "versionName": "0.8.0",
- "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.8.0/tdm-amg-0.8.0.apk",
- "sha256": "21781e9a1d89f25d14850a47b3d58bd08fb4b10db07f712ebcbd931ca244ffb3",
- "size": 49585749,
- "notes": "TDM AMG 0.8.0\n\nChức năng mới: TÍNH LIỀU KHÁNG SINH (nút ở trang chính, cần đăng nhập)\n- Nhập: giới, tuổi HOẶC năm sinh, cân nặng (kg), chiều cao (cm), SCr (chọn đơn vị µmol/L hoặc mg/dL), chọn kháng sinh.\n- Người ≥ 18 tuổi: Cockcroft–Gault (BMI, CN lý tưởng, CN hiệu chỉnh, eCrCl và khoảng eCrCl), 58 kháng sinh/kháng nấm.\n- Dưới 18 tuổi: Schwartz (tự chọn nhóm tuổi; trẻ < 1 tuổi có ô «sinh non»), 19 kháng sinh.\n- Công thức và chế độ liều giữ nguyên file Excel «Tính liều và CN thận» của tổ Dược lâm sàng (đã kiểm khớp từng ô).\n- Cảnh báo khi SCr có vẻ nhập sai đơn vị, chiều cao/cân nặng bất thường.\n- Chạy ngay trên máy, không cần mở OneDrive, không lưu dữ liệu người bệnh.\n- Mục «Cách pha truyền» sẽ được bổ sung ở bản sau.",
+ "versionCode": 10,
+ "versionName": "0.9.0",
+ "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.9.0/tdm-amg-0.9.0.apk",
+ "sha256": "48d9705f379d07ae6c9ede2096dcc39da2904c51d37bc8ef5eb765f385a567c4",
+ "size": 49584301,
+ "notes": "TDM AMG 0.9.0\n\nTính liều kháng sinh — thêm CÁCH PHA TRUYỀN\n- Dưới chế độ liều hiện cách pha truyền của thuốc đã chọn: từng mức liều/chế phẩm, dung môi, thể tích, thời gian truyền, bảo quản.\n- Dữ liệu: 37 thuốc, 137 dòng theo file của tổ Dược lâm sàng.\n- Mục mới «Tra cứu cách pha truyền»: xem cách pha của mọi thuốc trong dữ liệu (kể cả Kali clorid 10%, Methylprednisolon).",
  "required": false,
  "date": "2026-10-20"
 }
