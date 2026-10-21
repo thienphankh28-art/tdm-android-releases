@@ -464,6 +464,71 @@ class VancoState {
 const jsonList = (a) => Array.isArray(a) ? a.map(String) : [];
 const headRow = (c, title) => { const h = ui.row(c); const t = ui.text(h, title, 16, Col.text, true, 0); t.style.flex = '1'; return h; };
 
+// ================================================================== Nhap nhieu lieu (v0.10.1, giong MultiDose.kt)
+function lastByTime(list, at) {
+  let best = null, bt = -Infinity;
+  list.forEach((x) => { const d = parseIso(at(x)); if (d && d.getTime() >= bt) { bt = d.getTime(); best = x; } });
+  return best;
+}
+/** «📋 Nhập nhiều liều»: chuỗi liều giống nhau, chỉ khác giờ bắt đầu truyền. Lập lịch do Python (mobile_chuoi_lieu). */
+function multiDose(o) {
+  const S = Object.assign({ mode: 'last', last: '', count: '' }, o);
+  const form = () => {
+    const m = openModal('📋 Nhập nhiều liều', [
+      { label: 'Hủy', color: Col.gray, onClick: (close) => close() },
+      { label: 'Xem trước ▶', color: Col.blue, onClick: (close) => {
+        const dv = toNum(S.dose);
+        if (dv === null || dv <= 0) { toast('⚠️ Liều phải là số > 0.'); return; }
+        if (S.scr !== null && S.scr !== undefined && String(S.scr).trim() && toNum(S.scr) === null) { toast('⚠️ SCr phải là số (hoặc để trống).'); return; }
+        py('cl_plan', { first: S.first, tau: S.tau, tinf: S.tinf, mode: S.mode, last: S.last, count: S.count,
+          existing: S.existing.map(([at, tinf]) => ({ at, tinf })) }, (r) => {
+          if (!r.ok) { toast(r.message); return; }
+          close(); preview(r);
+        });
+      } }]);
+    const b = m.body;
+    const draw = () => {
+      b.innerHTML = '';
+      ui.hint(b, 'Các liều giống nhau, chỉ khác thời điểm bắt đầu truyền.');
+      const r1 = ui.row(b);
+      ui.field(ui.cell(r1), 'Liều (mg)', S.dose, (v) => { S.dose = v; });
+      ui.field(ui.cell(r1), 'τ (h)', S.tau, (v) => { S.tau = v; });
+      ui.field(ui.cell(r1), 'Tinf (h)', S.tinf, (v) => { S.tinf = v; });
+      if (S.scr !== null && S.scr !== undefined) ui.field(b, 'SCr (μmol/L)', S.scr, (v) => { S.scr = v; });
+      ui.dateTime(b, 'Bắt đầu truyền LIỀU ĐẦU', S.first, (v) => { S.first = v; });
+      const opts = ['Giờ bắt đầu truyền LIỀU CUỐI', 'Số liều'];
+      ui.choice(b, 'Kết thúc chuỗi theo', opts, S.mode === 'last' ? opts[0] : opts[1], (i) => { S.mode = i === 0 ? 'last' : 'count'; draw(); });
+      if (S.mode === 'last') ui.dateTime(b, 'Bắt đầu truyền LIỀU CUỐI', S.last, (v) => { S.last = v; }, true);
+      else ui.field(b, 'Số liều', S.count, (v) => { S.count = v; }, { hint: 'vd 5' });
+    };
+    draw();
+  };
+  const preview = (r) => {
+    let checks = [];
+    const m = openModal('Xác nhận các liều sẽ thêm', [
+      { label: '◀ Sửa lại', color: Col.gray, onClick: (close) => { close(); form(); } },
+      { label: 'Thêm', color: Col.greenBtn, onClick: (close) => {
+        const times = r.items.filter((_, i) => checks[i].checked).map((x) => x.at);
+        if (!times.length) return;
+        close(); S.onAdd(times, S.dose, S.tau, S.tinf, S.scr ?? '');
+      } }]);
+    const b = m.body;
+    const summary = ui.text(b, '', 14, Col.text, false, 4);
+    if (r.notes && r.notes.length) { const t = ui.text(b, r.notes.map((x) => 'ℹ️ ' + x).join('\n'), 13, Col.amber, false, 6); t.style.whiteSpace = 'pre-line'; }
+    const refresh = () => {
+      const k = checks.filter((c) => c.checked).length;
+      summary.textContent = `Sẽ thêm ${k}/${checks.length} liều ${g(toNum(S.dose))} mg, Tinf ${S.tinf} h, cách nhau τ = ${S.tau} h. Bỏ tick liều bị bỏ hoặc trễ thực tế (sửa giờ sau khi thêm).`;
+      m.btns[1].textContent = `Thêm ${k} liều`; m.btns[1].disabled = k === 0;
+    };
+    r.items.forEach((it, i) => {
+      checks.push(ui.check(b, `${i + 1}. ${it.label}`, it.on, refresh));
+      if (it.warn) ui.text(b, '⚠️ ' + it.warn, 12, Col.amber, false, 0).style.paddingLeft = '28px';
+    });
+    refresh();
+  };
+  form();
+}
+
 // ================================================================== Tab 1: buoc 1 benh nhan
 function invalidateResults() { const st = App.st; st.pop = null; st.szCalc = null; st.sz4 = null; st.bayes = null; }
 function buildPatient(p) {
@@ -561,6 +626,20 @@ const SzSteps = {
       const ok = prev && parseIso(prev.start) && toNum(prev.tau) !== null && toNum(prev.dose) !== null && toNum(prev.tinf) !== null;
       st.blocks.push(ok ? new SzBlock({ start: isoPlusHours(prev.start, toNum(prev.tau)), scr: prev.scr || '80', dose: prev.dose, tau: prev.tau, tinf: prev.tinf }) : new SzBlock());
       this.changed(); redraw(); scrollToBottom();
+    });
+    ui.button(p, '📋 Nhập nhiều liều', Col.gray, 8, () => {
+      const valid = st.blocks.filter((b) => parseIso(b.start) && toNum(b.tau) !== null);
+      const last = lastByTime(valid, (b) => b.start);
+      const tau = (last && toNum(last.tau) > 0) ? toNum(last.tau) : 24;
+      multiDose({ first: last ? isoPlusHours(last.start, tau) : nowHourIso(),
+        dose: last ? last.dose : g(st.pop ? st.pop.total_dose : 400), tau: g(tau), tinf: last ? last.tinf : '1',
+        scr: last ? (last.scr || '80') : '80', existing: valid.map((b) => [b.start, b.tinf]),
+        onAdd: (times, dose, t, tinf, scr) => {
+          if (st.blocks.length === 1 && !valid.length) st.blocks = [];
+          times.forEach((at) => st.blocks.push(new SzBlock({ start: at, scr, dose, tau: t, tinf })));
+          st.blocks.sort((x, y) => (parseIso(x.start) || new Date(8.64e15)) - (parseIso(y.start) || new Date(8.64e15)));
+          this.changed(); redraw(); toast(`Đã thêm ${times.length} liều.`);
+        } });
     });
     const status = ui.status(p);
     if (st.checkMsg) ui.setStatus(status, st.checkMsg, st.checkLevel);
@@ -724,7 +803,7 @@ const BayesSteps = {
   },
   buildDoses(p) {
     const st = App.st;
-    ui.hint(p, 'Nhập đầy đủ các liều trước thời điểm lấy mẫu (mô hình giả định biết toàn bộ lịch sử liều). τ chỉ dùng cho nút «Liều kế tiếp» và tính Cpeak/Ctrough hiện tại.');
+    ui.hint(p, 'Nhập đầy đủ các liều trước thời điểm lấy mẫu (mô hình giả định biết toàn bộ lịch sử liều). τ chỉ dùng cho nút «Liều kế tiếp» và tính Cpeak/Ctrough hiện tại. «📋 Nhập nhiều liều» thêm cả chuỗi liều giống nhau.');
     st.doses.sort((a, b) => (parseIso(a.at) || new Date(8.64e15)) - (parseIso(b.at) || new Date(8.64e15)));
     st.doses.forEach((d, i) => {
       const c = ui.card(p, 10);
@@ -741,10 +820,15 @@ const BayesSteps = {
         st.doses.push(DoseRow(isoPlusHours(d.at, tau), d.dose, d.tinf, g(tau))); this.changed(); redraw();
       });
     });
-    ui.button(p, '➕ Thêm liều thủ công', Col.gray, 12, () => {
-      const last = st.doses[st.doses.length - 1];
-      const at = (last && parseIso(last.at)) ? isoPlusHours(last.at, (toNum(last.tau) > 0) ? toNum(last.tau) : 24) : nowHourIso();
-      st.doses.push(DoseRow(at)); this.changed(); redraw(); scrollToBottom();
+    ui.button(p, '📋 Nhập nhiều liều', Col.gray, 12, () => {
+      const last = lastByTime(st.doses, (d) => d.at);
+      const tau = (last && toNum(last.tau) > 0) ? toNum(last.tau) : 24;
+      multiDose({ first: last ? isoPlusHours(last.at, tau) : nowHourIso(), dose: last ? last.dose : '400', tau: g(tau),
+        tinf: last ? last.tinf : '1', scr: null, existing: st.doses.map((d) => [d.at, d.tinf]),
+        onAdd: (times, dose, t, tinf) => {
+          times.forEach((at) => st.doses.push(DoseRow(at, dose, tinf, t)));
+          this.changed(); redraw(); toast(`Đã thêm ${times.length} liều.`);
+        } });
     });
   },
   buildMeas(p) {
@@ -924,7 +1008,7 @@ const VancoSteps = {
   },
   buildDoses(p) {
     const vs = App.vs;
-    ui.hint(p, 'Nhập lịch sử truyền thuốc — MỖI LIỀU có thời gian truyền Tinf riêng. «➕ Liều kế tiếp» thêm liều ngay sau liều đó, cách τ giờ, cùng liều và Tinf.');
+    ui.hint(p, 'Nhập lịch sử truyền thuốc — MỖI LIỀU có thời gian truyền Tinf riêng. «➕ Liều kế tiếp» thêm liều ngay sau liều đó, cách τ giờ, cùng liều và Tinf. «📋 Nhập nhiều liều» thêm cả chuỗi liều giống nhau.');
     vs.doses.forEach((d, i) => {
       const c = ui.card(p, 10);
       const head = headRow(c, `Liều ${i + 1}`);
@@ -939,10 +1023,16 @@ const VancoSteps = {
         vs.doses.splice(i + 1, 0, VDoseRow(isoPlusHours(d.at, tau), d.dose, d.tau, d.tinf)); this.changed(); redraw();
       });
     });
-    ui.button(p, '➕ Thêm liều thủ công', Col.gray, 12, () => {
-      const last = vs.doses[vs.doses.length - 1];
-      const at = last ? isoPlusHours(last.at, toNum(last.tau) ?? 12) : nowHourIso();
-      vs.doses.push(VDoseRow(at, '1000', '12', last ? last.tinf : '1')); this.changed(); redraw(); scrollToBottom();
+    ui.button(p, '📋 Nhập nhiều liều', Col.gray, 12, () => {
+      const last = lastByTime(vs.doses, (d) => d.at);
+      const tau = (last && toNum(last.tau) > 0) ? toNum(last.tau) : 12;
+      multiDose({ first: last ? isoPlusHours(last.at, tau) : nowHourIso(), dose: last ? last.dose : '1000', tau: g(tau),
+        tinf: last ? last.tinf : '1', scr: null, existing: vs.doses.map((d) => [d.at, d.tinf]),
+        onAdd: (times, dose, t, tinf) => {
+          times.forEach((at) => vs.doses.push(VDoseRow(at, dose, t, tinf)));
+          vs.doses.sort((x, y) => (parseIso(x.at) || new Date(8.64e15)) - (parseIso(y.at) || new Date(8.64e15)));
+          this.changed(); redraw(); toast(`Đã thêm ${times.length} liều.`);
+        } });
     });
   },
   buildMeas(p) {

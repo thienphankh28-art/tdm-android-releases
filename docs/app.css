@@ -45,3 +45,11 @@ button:disabled { opacity: .5; }
 .toast { position: fixed; left: 50%; bottom: calc(90px + env(safe-area-inset-bottom)); transform: translateX(-50%); max-width: 90%;
   background: #24292F; color: #fff; padding: 10px 14px; border-radius: 8px; font-size: 14px; opacity: 0; transition: opacity .25s; pointer-events: none; z-index: 20; }
 .toast.show { opacity: .95; }
+.modal-ov { position: fixed; inset: 0; z-index: 30; background: rgba(0,0,0,.45); display: flex; align-items: flex-end; justify-content: center; }
+.modal { background: #fff; width: 100%; max-width: 560px; max-height: 92vh; display: flex; flex-direction: column;
+  border-radius: 14px 14px 0 0; padding-bottom: env(safe-area-inset-bottom); }
+.modal-title { font-weight: 700; font-size: 17px; padding: 14px 16px 6px; }
+.modal-body { overflow-y: auto; padding: 0 16px 10px; -webkit-overflow-scrolling: touch; }
+.modal-btns { display: flex; gap: 8px; padding: 10px 16px 12px; border-top: 1px solid var(--border); }
+.mbtn { flex: 1; border: 0; border-radius: 8px; color: #fff; font-size: 15px; padding: 11px 6px; font-family: inherit; }
+@media (min-width: 600px) { .modal-ov { align-items: center; } .modal { border-radius: 14px; } }

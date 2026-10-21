@@ -71,6 +71,8 @@ def pwa_call(fn, req):
         import mobile_vanco as m
     elif fn.startswith("ks_"):
         import mobile_lieu_ks as m
+    elif fn.startswith("cl_"):
+        import mobile_chuoi_lieu as m
     else:
         import mobile_api as m
     f = getattr(m, fn)
@@ -92,7 +94,7 @@ async function handle(msg) {
       return { heavy: true };
     case 'call': {
       // Tab 1 / Tab 4 (mobile_api, mobile_vanco) can numpy + scipy; Tinh lieu KS thi khong
-      if (!msg.fn.startsWith('ks_')) await loadHeavy();
+      if (!msg.fn.startsWith('ks_') && !msg.fn.startsWith('cl_')) await loadHeavy();
       const out = py.globals.get('pwa_call')(msg.fn, msg.req || '{}');
       return JSON.parse(String(out));
     }

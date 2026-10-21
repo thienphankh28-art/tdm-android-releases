@@ -146,3 +146,22 @@ function toast(msg) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
 }
+
+// ---------------------------------------------------------------- hop thoai (modal) -- v0.10.1
+function openModal(title, buttons) {
+  const ov = el('div', 'modal-ov');
+  const pn = add(ov, el('div', 'modal'));
+  add(pn, el('div', 'modal-title', title));
+  const body = add(pn, el('div', 'modal-body'));
+  const bar = add(pn, el('div', 'modal-btns'));
+  const close = () => ov.remove();
+  const btns = buttons.map((b) => {
+    const x = add(bar, el('button', 'mbtn', b.label));
+    x.style.background = b.color || Col.gray;
+    x.addEventListener('click', (ev) => { ev.preventDefault(); b.onClick(close); });
+    return x;
+  });
+  ov.addEventListener('click', (ev) => { if (ev.target === ov) close(); });   // cham ra ngoai = dong
+  document.body.appendChild(ov);
+  return { body, close, btns };
+}
