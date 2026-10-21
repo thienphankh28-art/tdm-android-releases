@@ -1,10 +1,10 @@
 {
- "versionCode": 12,
- "versionName": "0.10.0",
- "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.10.0/tdm-amg-0.10.0.apk",
- "sha256": "4a84214ec4aafb7331c55d2c11d388ae61a03a5e9462ad63cd2c07abbce3da28",
- "size": 49616449,
- "notes": "TDM AMG 0.10.0\n\n- Tính liều kháng sinh: bảng liều và cách pha truyền nay được tải từ máy chủ sau khi đăng nhập — thuốc mới/sửa đổi hiện ngay, không cần cập nhật app.\n- Bản sao trên máy được mã hóa (khóa Android Keystore), chỉ app đọc được; mất mạng vẫn dùng bản đã lưu.\n- Tài khoản admin: thêm «Quản lý bảng liều & cách pha truyền» — thêm/sửa/xóa thuốc (người lớn / trẻ em, liều theo từng khoảng eCrCl, tính theo mg/kg có giới hạn tối đa), xem thử trước khi lưu, nhật ký sửa đổi.\n- Kết quả liều hiển thị thêm dòng eCrCl được áp dụng và ghi chú của thuốc.",
+ "versionCode": 13,
+ "versionName": "0.10.1",
+ "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.10.1/tdm-amg-0.10.1.apk",
+ "sha256": "399802da5e7e8815ec3cdbe6e698091f34809a66db27c1bfc324b2198b0e0295",
+ "size": 49635209,
+ "notes": "TDM AMG 0.10.1\n\n- Nhập liều (Tab 1 Sawchuk–Zaske, Tab 1 Bayesian, Tab 4 Vancomycin): thêm nút «📋 Nhập nhiều liều» — nhập giờ bắt đầu truyền liều đầu, τ, rồi giờ bắt đầu truyền liều cuối HOẶC số liều; app liệt kê từng liều để xác nhận (bỏ tick liều bị bỏ/trễ; liều trùng/chồng với liều đã có được bỏ tick sẵn) trước khi thêm hàng loạt.\n- Bỏ nút «Thêm liều thủ công» (đã có «➕ Liều kế tiếp» ở từng dòng liều).\n- Giống phần mềm máy tính bản 21/10/2026 và bản iPhone.",
  "required": false,
- "date": "2026-10-20"
+ "date": "2026-10-21"
 }
