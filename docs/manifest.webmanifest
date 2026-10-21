@@ -1,0 +1,16 @@
+{
+  "name": "TDM Aminoglycosid",
+  "short_name": "TDM",
+  "description": "TDM Aminoglycosid / Vancomycin và tính liều kháng sinh",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F6F8FA",
+  "theme_color": "#24292F",
+  "lang": "vi",
+  "icons": [
+    {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png"},
+    {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}

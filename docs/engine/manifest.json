@@ -1,0 +1,11 @@
+{
+ "version": "20261021-c3c18c8d",
+ "file": "engine-20261021-c3c18c8d.bin",
+ "sha256": "c3c18c8d2a0433245d471a9bc00fccf5370f92592d03d8c9737f4c9399be58da",
+ "key": "pxt9RQKUAeN4WT+s0Dsnf1s6Ge8dY9Z+nMG7Jk3aXWuSjNTOQsln5D9ShI7eOCkLdHx5OWvswB+NZvz5e54RFXDI0LEuPeQ2c/r8Jui7gKU262LjdcyrKeOgGSZ1uW1oIpGXiS8nANzVbgcy+WrqFkJmhOBUudgiHgPjtHYwVxN1EVAf43+03myWg4Ou4uSvr4Q7IqmuMsGmH09zvrsLpLOk1vNkintNIz/zg0DOCHx80qmVLbDwpugP7muHw6GchHrtWf2CA1Y/Y0w/dSVajvajeBHXBDeTwaXAoXEw6lYXsYsogigFfxLktuFmx7eiD+Rroo5yYtJ2hOkPyBomH0uB4g4xJlHF+9KlXK826JOgmGxgtMv04X6Wz9HcY1SXbRUMaCJfs4GTZP8SDb6ip62g+0LYjbtnJXlRT7oxBFNm8cSczdrb0wOiuPFHnh42UO5fnpnpobRC6lsVbhEL4MU9XTA/zf98hvESFcicXWCcAdVC5FfU6iW1APohqg5M",
+ "iv": "sPZrA+lwn4PsOTsp",
+ "files": 16,
+ "python": "3.12",
+ "pyodide": "0.27.7",
+ "built": "2026-10-21T03:52:42.542401+00:00"
+}
