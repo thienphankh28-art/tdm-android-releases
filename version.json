@@ -1,10 +1,10 @@
 {
- "versionCode": 16,
- "versionName": "0.11.2",
- "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.11.2/tdm-amg-0.11.2.apk",
- "sha256": "e9acd747f709ed498f15bd9c2f0e4d4fb039f4f6447fd09b70e9c7f66a1b1810",
- "size": 49649193,
- "notes": "TDM AMG 0.11.2\n\n- Tính liều kháng sinh — «Cách tính»: hiểu đúng công thức làm tròn bội số (ví dụ ROUND(W*15/250,0)*250 → «15 mg/kg (làm tròn bội 250 mg)»), không còn ghi nhầm «kết quả ÷ 250»; khoảng liều có trần ở số sau cũng hiện «tối đa».\n- Liều tính ra không đổi. Bản iPhone và phần mềm máy tính (Tab 2 quản lý bảng liều) dùng cùng bộ tính.",
+ "versionCode": 17,
+ "versionName": "0.12.0",
+ "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.12.0/tdm-amg-0.12.0.apk",
+ "sha256": "f665f001d7c4e0c376a0f7022a5771f1ceba35ef834dc84148af12f6d1bf87d1",
+ "size": 49650521,
+ "notes": "TDM AMG 0.12.0\n\n- Tính liều kháng sinh + chức năng thận: KHÔNG cần đăng nhập — mở ngay ở màn hình đầu. Chỉ cần đăng nhập để làm TDM (Tab 1, Tab 4) hoặc quản lý bảng liều (admin).\n- Chưa đăng nhập vẫn tự tải bảng liều mới nhất từ máy chủ (cần chạy SQL F1 một lần); mất mạng dùng bảng đã lưu trên máy.\n- Liều có liều nạp hiển thị tách dòng: «LD …» rồi «MD …». Nhiều chế độ liều (ngăn bằng «hay»/«hoặc») hiển thị «Chế độ 1: …», «Chế độ 2: …». Mục «Cách tính» cũng vậy. Nội dung liều không đổi.\n- Bản iPhone cập nhật cùng lúc.",
  "required": false,
  "date": "2026-10-22"
 }
