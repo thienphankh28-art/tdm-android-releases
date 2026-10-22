@@ -1097,6 +1097,7 @@ const VancoSteps = {
     ui.setStatus(status, 'Đang chạy tối ưu Bayes…');
     py('v_solve', vs.json(), (r) => {
       vs.result = r.ok ? r : null;
+      vs.proj = null;
       ui.setStatus(status, r.message, r.level);
       if (r.priors) {
         const pr = r.priors;
@@ -1124,22 +1125,93 @@ const VancoSteps = {
   buildNewDose(p) {
     const vs = App.vs;
     if (!vs.result) { ui.text(p, '⚠️ Chưa có kết quả Bayes hợp lệ — quay lại bước «Kết quả Bayes».', 15, Col.amber, false, 12); return; }
+    vs.extraRegs = vs.extraRegs || [];
+    // ---- phac do so sanh (v0.13.0)
     const c = ui.card(p);
-    ui.hint(c, 'AUC24h khi cân bằng = (Liều mới × 24) / (τ mới × Clbn). Cpred dự đoán: cộng dồn các liều đã nhập + các liều của chế độ MỚI dùng từ sau liều cuối đến thời điểm dự đoán.');
-    ui.text(c, 'Chế độ liều mới', 15, Col.text, true, 6);
+    ui.header(c, 'Phác đồ so sánh');
+    ui.hint(c, 'Phác đồ mới bắt đầu từ: giờ liều cuối đã nhập + τ mới. Dòng «đang dùng» được thêm tự động.');
     const r1 = ui.row(c);
-    ui.field(ui.cell(r1), 'Liều mới (mg)', vs.newDose, (v) => { vs.newDose = v; });
-    ui.field(ui.cell(r1), 'τ mới (h)', vs.newTau, (v) => { vs.newTau = v; });
-    ui.field(ui.cell(r1), 'Tinf mới (h)', vs.newTinf, (v) => { vs.newTinf = v; });
-    ui.dateTime(c, 'Thời điểm dự đoán (bỏ trống = mặc định 30 phút trước liều thứ 5 của chế độ mới)', vs.target, (v) => { vs.target = v; }, true);
-    const res = add(c, ui.vbox());
-    const calc = () => py('v_newdose', { new_dose: vs.newDose, new_tau: vs.newTau, new_tinf: vs.newTinf, target: vs.target }, (r) => {
+    ui.field(ui.cell(r1), 'Liều (mg)', vs.newDose, (v) => { vs.newDose = v; vs.proj = null; });
+    ui.field(ui.cell(r1), 'τ (giờ)', vs.newTau, (v) => { vs.newTau = v; vs.proj = null; });
+    ui.field(ui.cell(r1), 'Tinf (giờ)', vs.newTinf, (v) => { vs.newTinf = v; vs.proj = null; });
+    vs.extraRegs.forEach((g, i) => {
+      const rr = ui.row(c);
+      ui.field(ui.cell(rr), 'Liều (mg)', g[0], (v) => { g[0] = v; vs.proj = null; });
+      ui.field(ui.cell(rr), 'τ (giờ)', g[1], (v) => { g[1] = v; vs.proj = null; });
+      ui.field(ui.cell(rr), 'Tinf (giờ)', g[2], (v) => { g[2] = v; vs.proj = null; });
+      ui.smallButton(ui.cell(rr, 0.45), '✖', Col.gray, () => { vs.extraRegs.splice(i, 1); vs.proj = null; redraw(); });
+    });
+    if (vs.extraRegs.length < 4) ui.smallButton(c, '+ Thêm phác đồ', Col.purple, () => { vs.extraRegs.push([vs.newDose, vs.newTau, vs.newTinf]); vs.proj = null; redraw(); });
+    const st = ui.status(c);
+    const project = () => {
+      const regs = [{ dose: vs.newDose, tau: vs.newTau, tinf: vs.newTinf }].concat(vs.extraRegs.map((g) => ({ dose: g[0], tau: g[1], tinf: g[2] })));
+      py('v_project', { regimens: regs, include_current: true }, (r) => {
+        if (!r.ok) { vs.proj = null; ui.setStatus(st, r.message, r.level || 'warn'); return; }
+        vs.proj = r; vs.projSel = (r.items || []).length > 1 ? 1 : 0; redraw();
+      });
+    };
+    ui.button(c, '🧮 TÍNH DỰ ĐOÁN', Col.purple, 10, project);
+    if (vs.proj) { this.matrix(p, vs.proj); this.detail(p, vs.proj); } else project();
+  },
+  matrix(p, pr) {
+    const vs = App.vs, items = pr.items || [];
+    const c = ui.card(p, 10);
+    ui.header(c, 'So sánh phác đồ — AUC24h (mg·h/L)');
+    const d0 = items[0].days[0];
+    ui.hint(c, `Ngày TDM (${d0.date}, liều đã dùng): ${d0.auc} · CL bệnh nhân ${pr.cl} L/h`);
+    const head = add(c, el('div', 'pmx pmx-h'));
+    ['Phác đồ', '+1', '+2', '+3', '+4', 'Cân bằng'].forEach((t, i) => add(head, el('div', i === 5 ? 'pmx-ss' : null, t)));
+    items.forEach((it, i) => {
+      const row = add(c, el('button', 'pmx pmx-row' + (i === vs.projSel ? ' sel' : '')));
+      const lab = add(row, el('div', 'pmx-lab'));
+      add(lab, el('b', null, it.label));
+      const sub = it.current ? 'đang dùng' : (i === vs.projSel ? 'đang xem' : '');
+      if (sub) add(lab, el('span', null, sub));
+      for (let k = 1; k <= 4; k++) add(row, el('div', 'pchip st-' + it.days[k].status, String(it.days[k].auc)));
+      add(row, el('div', 'pchip solid st-' + it.ss.status, it.ss.text));
+      row.addEventListener('click', (ev) => { ev.preventDefault(); vs.projSel = i; redraw(); });
+    });
+    const anyRange = items.some((it) => it.ss.range);
+    ui.hint(c, 'Nền xanh: 400–600 · đỏ: > 600 · vàng: < 400. Bấm 1 dòng để xem chi tiết từng ngày.' +
+      (anyRange ? '\nτ không chia hết 24 h: AUC mỗi ngày khác nhau — cột «Cân bằng» ghi khoảng thấp nhất–cao nhất.' : '')).style.whiteSpace = 'pre-line';
+  },
+  detail(p, pr) {
+    const vs = App.vs, items = pr.items || [];
+    const it = items[Math.min(Math.max(vs.projSel || 0, 0), items.length - 1)];
+    const c = ui.card(p, 10);
+    ui.header(c, `Chi tiết: ${it.label}, Tinf ${g(it.tinf)} h`);
+    ui.hint(c, 'Liều đầu của phác đồ: ' + it.start);
+    const worst = it.days.slice(1).map((d) => d.status).concat([it.ss.status]);
+    const tone = worst.includes('high') ? 'high' : (worst.includes('low') ? 'low' : 'ok');
+    add(c, el('div', 'pban st-' + tone, it.summary));
+    const tb = add(c, el('div', 'pdt'));
+    const hd = add(tb, el('div', 'pdt-row pdt-h'));
+    ['Ngày', 'AUC24h', 'Cmin', 'Đánh giá'].forEach((t) => add(hd, el('div', null, t)));
+    it.days.forEach((d) => {
+      const r = add(tb, el('div', 'pdt-row' + (d.k === 0 ? ' tdm' : '')));
+      const l = add(r, el('div', 'pdt-lab')); add(l, el('b', null, d.label)); add(l, el('span', null, d.date + (d.k === 0 ? ' · đã dùng' : '')));
+      add(r, el('div', 'pdt-auc st-' + d.status, String(d.auc)));
+      add(r, el('div', 'pdt-num', num(d.cmin, 1)));
+      const cc = add(r, el('div')); add(cc, el('span', 'pchip ' + (d.status === 'high' ? 'solid ' : '') + 'st-' + d.status, d.status_vi));
+    });
+    const rs = add(tb, el('div', 'pdt-row ss'));
+    add(rs, el('div', 'pdt-lab', null)).appendChild(el('b', null, 'Khi cân bằng'));
+    add(rs, el('div', 'pdt-auc big st-' + it.ss.status, it.ss.text));
+    add(rs, el('div', 'pdt-num', ''));
+    const cs = add(rs, el('div')); add(cs, el('span', 'pchip solid st-' + it.ss.status, it.ss.status_vi));
+    ui.hint(c, 'Đạt: 400–600 · Cao: > 600 · Thấp: < 400 · Cmin: nồng độ thấp nhất trong ngày (μg/mL).');
+    // ---- Cpred tai thoi diem chon
+    const cc = ui.card(p, 10);
+    ui.header(cc, 'Cpred tại thời điểm chọn');
+    ui.dateTime(cc, 'Thời điểm (bỏ trống = 30 phút trước liều thứ 5 của phác đồ)', vs.target, (v) => { vs.target = v; }, true);
+    const res = add(cc, ui.vbox());
+    const calc = () => py('v_newdose', { new_dose: it.dose, new_tau: it.tau, new_tinf: it.tinf, target: vs.target }, (r) => {
       res.innerHTML = ''; vs.newRes = r;
       if (!r.ok) { ui.text(res, r.message || '', 14, Col.amber); return; }
-      ui.metrics(res, [['AUC24h khi cân bằng – liều mới (mg·h/L)', String(r.auc_new ?? '')], ['Cpred dự đoán (μg/mL)', String(r.cpred ?? '')]]);
+      ui.metrics(res, [['Cpred dự đoán (μg/mL)', String(r.cpred ?? '')]]);
       ui.text(res, r.cpred_note || '', 12, Col.muted, false, 6);
     });
-    ui.button(c, '🧮 TÍNH AUC & Cpred DỰ ĐOÁN', Col.purple, 10, calc);
+    ui.button(cc, 'Tính Cpred', Col.blue, 8, calc);
     calc();
   },
   hist: null, delStatus: null,
