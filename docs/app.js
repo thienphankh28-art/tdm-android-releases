@@ -883,8 +883,8 @@ const BayesSteps = {
     const cards = r.cards, cur = r.current;
     const items = [['CL_post (L/h)', num(cards.cl, 4)], ['Vd_post / V1_post (L)', num(cards.vd, 2)], ['Ke (h⁻¹)', num(cards.ke, 4)], ['OFV_final', num(cards.ofv, 4)]];
     if (cur) items.push(['Cpeak hiện tại (μg/mL)', num(cur.cpeak, 2)], ['Ctrough hiện tại (μg/mL)', num(cur.ctrough, 2)],
-      ['Liều đang dùng (mg)', g(cur.dose)], ['τ đang dùng (h)', g(cur.tau)], ['AUC24 hiện tại SS (mg·h/L)', optNum(cur, 'auc24', 1)],
-      ['AUC24/MIC hiện tại', optNum(cur, 'auc_mic', 1)]);
+      ['Liều đang dùng (mg)', g(cur.dose)], ['τ đang dùng (h)', g(cur.tau)], ['AUC24h khi cân bằng (mg·h/L)', optNum(cur, 'auc24', 1)],
+      ['AUC24h/MIC khi cân bằng', optNum(cur, 'auc_mic', 1)]);
     ui.metrics(box, items);
     if (cur) ui.hint(box, r.mic_note || '');
     ui.text(box, r.eta_text || '', 13, Col.muted, false, 10);
@@ -915,7 +915,7 @@ const BayesSteps = {
         const r2 = ui.row(c);
         const calc = () => py('bayes_newdose', { dose: nd.dose, tau: nd.tau, tinf: nd.tinf, mic: st.mic }, (r) => {
           if (r.ok) {
-            nd.result = `Cpeak: ${num(r.cpeak, 2)} μg/mL   Ctrough: ${num(r.ctrough, 2)} μg/mL\nAUC24: ${optNum(r, 'auc24', 1)} mg·h/L   AUC24/MIC: ${optNum(r, 'auc_mic', 1)}`;
+            nd.result = `Cpeak: ${num(r.cpeak, 2)} μg/mL   Ctrough: ${num(r.ctrough, 2)} μg/mL\nAUC24h khi cân bằng: ${optNum(r, 'auc24', 1)} mg·h/L   AUC24h/MIC: ${optNum(r, 'auc_mic', 1)}`;
             res.textContent = nd.result;
           } else toast(r.message);
         });
@@ -1070,9 +1070,10 @@ const VancoSteps = {
       ui.metrics(c, [['CL_optimized (L/h)', k.cl], ['Vc_optimized (L)', k.vc], ['Vp_optimized (L)', k.vp], ['C_pred_final (μg/mL)', k.cpred],
         ['OFV_final', k.ofv], ['k10 (h⁻¹)', k.k10], ['k12 (h⁻¹)', k.k12], ['k21 (h⁻¹)', k.k21], ['α (h⁻¹)', k.alpha], ['β (h⁻¹)', k.beta]].map(([a, b]) => [a, String(b ?? '')]));
       const c2 = ui.card(box);
-      ui.header(c2, 'AUC');
-      ui.hint(c2, 'AUC hiện tại = Liều × 24 / (τ × Clbn) — theo LIỀU ĐANG DÙNG (liều kề trước các điểm đo của lần TDM cuối).');
-      ui.metrics(c2, [['AUC hiện tại (mg·h/L)', String(r.auc_current ?? '')], ['AUC ngày TDM — 24 h thực tế', String(r.auc_day ?? '')]]);
+      ui.header(c2, 'AUC24h');
+      ui.hint(c2, 'AUC24h ngày TDM = diện tích dưới đường cong trong 24 giờ thực tế của ngày lấy mẫu (từ liều kề trước mẫu đo). ' +
+        'AUC24h khi cân bằng = Liều × 24 / (τ × Clbn) — nếu tiếp tục LIỀU ĐANG DÙNG đến trạng thái cân bằng.');
+      ui.metrics(c2, [['AUC24h ngày TDM (mg·h/L)', String(r.auc_day ?? '')], ['AUC24h khi cân bằng (mg·h/L)', String(r.auc_current ?? '')]]);
       ui.text(c2, r.auc_day_info || '', 12, Col.muted, false, 6);
       if (r.chart) {
         const cc = ui.card(box);
@@ -1086,7 +1087,7 @@ const VancoSteps = {
     const vs = App.vs;
     if (!vs.result) { ui.text(p, '⚠️ Chưa có kết quả Bayes hợp lệ — quay lại bước «Kết quả Bayes».', 15, Col.amber, false, 12); return; }
     const c = ui.card(p);
-    ui.hint(c, 'AUC = (Liều mới × 24) / (τ mới × Clbn). Cpred dự đoán: cộng dồn các liều đã nhập + các liều của chế độ MỚI dùng từ sau liều cuối đến thời điểm dự đoán.');
+    ui.hint(c, 'AUC24h khi cân bằng = (Liều mới × 24) / (τ mới × Clbn). Cpred dự đoán: cộng dồn các liều đã nhập + các liều của chế độ MỚI dùng từ sau liều cuối đến thời điểm dự đoán.');
     ui.text(c, 'Chế độ liều mới', 15, Col.text, true, 6);
     const r1 = ui.row(c);
     ui.field(ui.cell(r1), 'Liều mới (mg)', vs.newDose, (v) => { vs.newDose = v; });
@@ -1097,7 +1098,7 @@ const VancoSteps = {
     const calc = () => py('v_newdose', { new_dose: vs.newDose, new_tau: vs.newTau, new_tinf: vs.newTinf, target: vs.target }, (r) => {
       res.innerHTML = ''; vs.newRes = r;
       if (!r.ok) { ui.text(res, r.message || '', 14, Col.amber); return; }
-      ui.metrics(res, [['AUC kết quả (mg·h/L)', String(r.auc_new ?? '')], ['Cpred dự đoán (μg/mL)', String(r.cpred ?? '')]]);
+      ui.metrics(res, [['AUC24h khi cân bằng – liều mới (mg·h/L)', String(r.auc_new ?? '')], ['Cpred dự đoán (μg/mL)', String(r.cpred ?? '')]]);
       ui.text(res, r.cpred_note || '', 12, Col.muted, false, 6);
     });
     ui.button(c, '🧮 TÍNH AUC & Cpred DỰ ĐOÁN', Col.purple, 10, calc);
@@ -1132,7 +1133,7 @@ const VancoSteps = {
     if (!Array.isArray(h) || !h.length) { ui.hint(box, 'Chưa có kết quả nào.'); return; }
     h.forEach((o, i) => {
       const d = (k, n) => (o[k] === null || o[k] === undefined) ? '--' : num(Number(o[k]), n);
-      const cb = ui.check(box, `${o.date || ''} · ${o.method || ''}\nCL ${d('cl', 4)} · Vc ${d('vc', 2)} · Vp ${d('vp', 2)} · AUC ${d('auc', 2)}`, vs.selected.has(i),
+      const cb = ui.check(box, `${o.date || ''} · ${o.method || ''}\nCL ${d('cl', 4)} · Vc ${d('vc', 2)} · Vp ${d('vp', 2)} · AUC24h cân bằng ${d('auc', 2)}`, vs.selected.has(i),
         (b) => { if (b) vs.selected.add(i); else vs.selected.delete(i); });
       cb.parentNode.style.whiteSpace = 'pre-line';
     });
@@ -1263,7 +1264,12 @@ const KsSteps = {
     if (!d) { ui.hint(c2, 'Chọn kháng sinh để xem chế độ liều.'); return; }
     ui.header(c2, '💊 ' + d.drug);
     ui.text(c2, d.text, 18, Col.blue, true, 6);
-    if (d.dong) ui.hint(c2, 'Áp dụng dòng: ' + d.dong);
+    const ct = d.cach_tinh;  // v0.11.0: cach tinh cho thuoc tinh theo mg/kg
+    if (ct) {
+      ui.text(c2, '🧮 Cách tính', 15, Col.text, true, 10);
+      [['Cân nặng tính liều', 'can_nang'], ['Mức liều', 'muc_lieu'], ['Áp dụng khi', 'crcl'], ['Khoảng đưa liều', 'khoang']]
+        .forEach(([lbl, k]) => { if (ct[k]) ui.text(c2, `• ${lbl}: ${ct[k]}`, 14, Col.text, false, 3); });
+    } else if (d.dong) ui.hint(c2, 'Áp dụng dòng: ' + d.dong);
     if (d.ghi_chu) ui.text(c2, '📝 ' + d.ghi_chu, 14, Col.amber, false, 4);
     ui.text(c2, '💧 Cách pha truyền', 15, Col.text, true, 14);
     this.phaRows(c2, d.pha_truyen);
