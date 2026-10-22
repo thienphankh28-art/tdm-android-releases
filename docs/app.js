@@ -127,6 +127,28 @@ async function loadEngine(session) {
   engineInfo = man;
 }
 
+// v0.12.0: goi tinh lieu khang sinh (khong ma hoa) cho nguoi CHUA dang nhap. Da dang nhap -> bo tinh day du da co san.
+let ksEngineReady = null;
+function loadKsEngine() {
+  if (engineInfo) return Promise.resolve();
+  if (!ksEngineReady) {
+    ksEngineReady = (async () => {
+      setBusyText('Đang tải bộ tính liều kháng sinh…');
+      const man = await (await fetch(BASE + 'engine/manifest.json', { cache: 'no-cache' })).json();
+      if (!man.ks) throw new Error('Bản này chưa có gói tính liều không cần đăng nhập.');
+      const r = await fetch(BASE + 'engine/' + man.ks.file);
+      if (!r.ok) throw new Error('Không tải được gói tính liều');
+      const zip = await r.arrayBuffer();
+      if (hex(await crypto.subtle.digest('SHA-256', zip)) !== man.ks.sha256) throw new Error('Gói tính liều bị lỗi (sai mã kiểm tra).');
+      await ensureRuntime();
+      await callWorker('ks_engine', { zip: new Uint8Array(zip), url: CFG.url, key: CFG.key }, []);
+    })();
+    ksEngineReady.catch(() => { ksEngineReady = null; });
+  }
+  return ksEngineReady;
+}
+function goHome() { if (App.user) showHome(); else showLogin(); }
+
 // ================================================================== khung man hinh
 const $ = (id) => document.getElementById(id);
 let busyCount = 0;
@@ -173,8 +195,24 @@ const AppInfo = {
 
 function showLogin() {
   App.stepIdx = -2;
-  const body = page('TDM Aminoglycosid', 'Đăng nhập', false);
+  const body = page('TDM Aminoglycosid', 'Tính liều kháng sinh · Đăng nhập để làm TDM', false);
+  // v0.12.0: tinh lieu + chuc nang than KHONG can dang nhap
+  const k = ui.card(body, 12);
+  ui.header(k, '🧪 Tính liều kháng sinh');
+  ui.hint(k, 'Chức năng thận (Cockcroft–Gault / Schwartz) và chế độ liều kháng sinh, cách pha truyền. Không cần đăng nhập, không lưu dữ liệu.');
+  const kst = ui.status(k);
+  ui.button(k, 'Mở tính liều kháng sinh', Col.greenBtn, 10, () => {
+    busy(true);
+    loadKsEngine().then(() => { busy(false); App.module = 'ks'; startWizard(); })
+      .catch((e) => {
+        busy(false);
+        const offline = !navigator.onLine || /Failed to fetch|NetworkError|Load failed/i.test(e.message);
+        ui.setStatus(kst, offline ? '❌ Chưa tải được bộ tính — cần có mạng ở lần mở đầu tiên.' : '❌ ' + e.message, 'error');
+      });
+  });
   const c = ui.card(body, 16);
+  ui.header(c, '🔐 Đăng nhập');
+  ui.hint(c, 'Đăng nhập để làm TDM (Aminoglycosid, Vancomycin) hoặc quản lý bảng liều (admin).');
   let u = localStorage.getItem('tdm_user') || '';
   let p = '';
   ui.field(c, 'Tên đăng nhập', u, (v) => { u = v; }, { numeric: false, autocomplete: 'username' });
@@ -332,8 +370,8 @@ function redraw(keep = true) {
   go(App.stepIdx);
   if (keep) setTimeout(() => window.scrollTo(0, y), 0);
 }
-function next() { if (App.stepIdx < 0) return; if (App.stepIdx < App.steps.length - 1) go(App.stepIdx + 1); else showHome(); }
-function back() { if (App.stepIdx > 0) go(App.stepIdx - 1); else if (App.stepIdx === 0) showHome(); }
+function next() { if (App.stepIdx < 0) return; if (App.stepIdx < App.steps.length - 1) go(App.stepIdx + 1); else goHome(); }
+function back() { if (App.stepIdx > 0) go(App.stepIdx - 1); else if (App.stepIdx === 0) goHome(); }
 
 function saveWithConfirm(fn, req, status, after = () => {}) {
   py(fn, req, (r) => {
@@ -1263,12 +1301,12 @@ const KsSteps = {
     const c2 = ui.card(box, 10);
     if (!d) { ui.hint(c2, 'Chọn kháng sinh để xem chế độ liều.'); return; }
     ui.header(c2, '💊 ' + d.drug);
-    ui.text(c2, d.text, 18, Col.blue, true, 6);
+    ui.text(c2, d.text, 18, Col.blue, true, 6).style.whiteSpace = 'pre-line';   // v0.12.0: LD / MD tren 2 dong
     const ct = d.cach_tinh;  // v0.11.0: cach tinh cho thuoc tinh theo mg/kg
     if (ct) {
       ui.text(c2, '🧮 Cách tính', 15, Col.text, true, 10);
       [['Cân nặng tính liều', 'can_nang'], ['Mức liều', 'muc_lieu'], ['Áp dụng khi', 'crcl'], ['Khoảng đưa liều', 'khoang']]
-        .forEach(([lbl, k]) => { if (ct[k]) ui.text(c2, `• ${lbl}: ${ct[k]}`, 14, Col.text, false, 3); });
+        .forEach(([lbl, k]) => { if (ct[k]) ui.text(c2, `• ${lbl}: ${ct[k]}`, 14, Col.text, false, 3).style.whiteSpace = 'pre-line'; });
     } else if (d.dong) ui.hint(c2, 'Áp dụng dòng: ' + d.dong);
     if (d.ghi_chu) ui.text(c2, '📝 ' + d.ghi_chu, 14, Col.amber, false, 4);
     ui.text(c2, '💧 Cách pha truyền', 15, Col.text, true, 14);

@@ -89,6 +89,11 @@ async function handle(msg) {
       py.runPython(GLUE);
       py.globals.get('pwa_setup')(msg.url, msg.key, msg.token, msg.user, msg.pw, msg.role);
       return { installed: true };
+    case 'ks_engine':          // v0.12.0: goi tinh lieu KS (chua dang nhap) -- khong ma phien
+      installEngine(msg.zip);
+      py.runPython(GLUE);
+      py.globals.get('pwa_setup')(msg.url, msg.key, null, null, null, '');
+      return { installed: true };
     case 'heavy':
       await loadHeavy();
       return { heavy: true };

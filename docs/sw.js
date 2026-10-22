@@ -1,8 +1,8 @@
 // sw.js -- Service Worker: luu san giao dien + Python (Pyodide) de mo nhanh va dung duoc khi mat mang.
 // * Giao dien + manifest bo tinh: lay MANG TRUOC (luon nhan ban moi nhat), mat mang -> dung ban da luu.
 // * Pyodide (ten file co so phien ban) + goi bo tinh (engine-<phien ban>.bin): lay BO NHO TRUOC.
-// 20261022-13a0cb1e-2ab259 duoc tools/pwa_build.py thay bang ma phien ban -> moi lan dang ban moi, cache cu duoc don.
-const BUILD = '20261022-13a0cb1e-2ab259';
+// 20261022-f6f4d7b7-bfe19f duoc tools/pwa_build.py thay bang ma phien ban -> moi lan dang ban moi, cache cu duoc don.
+const BUILD = '20261022-f6f4d7b7-bfe19f';
 const SHELL = 'tdm-shell-' + BUILD;
 const BIG = 'tdm-big-v1';
 self.addEventListener('install', (e) => { self.skipWaiting(); });
@@ -15,7 +15,7 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   const url = new URL(e.request.url);
   if (e.request.method !== 'GET' || url.origin !== location.origin) return;     // Supabase, ... -> khong can thiep
-  const big = url.pathname.includes('/pyodide/') || /\/engine\/engine-[^/]+\.bin$/.test(url.pathname);
+  const big = url.pathname.includes('/pyodide/') || /\/engine\/(engine-[^/]+\.bin|ks-[^/]+\.zip)$/.test(url.pathname);
   if (big) {
     e.respondWith((async () => {
       const c = await caches.open(BIG);
@@ -24,7 +24,8 @@ self.addEventListener('fetch', (e) => {
       const r = await fetch(e.request);
       if (r.ok) {
         if (url.pathname.includes('/engine/')) {            // chi giu goi bo tinh moi nhat
-          for (const k of await c.keys()) if (k.url.includes('/engine/engine-')) await c.delete(k);
+          const pre = url.pathname.includes('/engine/ks-') ? '/engine/ks-' : '/engine/engine-';
+          for (const k of await c.keys()) if (k.url.includes(pre)) await c.delete(k);
         }
         c.put(e.request, r.clone());
       }
