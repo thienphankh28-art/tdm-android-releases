@@ -1,10 +1,10 @@
 {
- "versionCode": 14,
- "versionName": "0.11.0",
- "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.11.0/tdm-amg-0.11.0.apk",
- "sha256": "62aca9e5bf344d0b0b121cc9da29680b501d7a4c5d40f0408a0564a6dbdab3cf",
- "size": 49649121,
- "notes": "TDM AMG 0.11.0\n\n- TDM Bayes (Tab 4 Vancomycin): đổi tên và thứ tự 2 chỉ số AUC cho dễ hiểu — «AUC24h ngày TDM» (24 giờ thực tế của ngày lấy mẫu) đứng trước, rồi «AUC24h khi cân bằng» (nếu tiếp tục liều đang dùng). Liều mới: «AUC24h khi cân bằng – liều mới». Lịch sử: «AUC24h cân bằng».\n- Tab 1 Bayesian: «AUC24 hiện tại SS» → «AUC24h khi cân bằng»; «AUC24/MIC» → «AUC24h/MIC».\n- Tính liều kháng sinh: thuốc tính theo cân nặng (mg/kg) hiện thêm «🧮 Cách tính» — cân nặng tính liều (và quy tắc chọn), mức liều mg/kg (kèm liều tối đa), khoảng eCrCl/eGFR áp dụng, khoảng đưa liều. Tự sinh từ bảng liều nên luôn khớp bảng đang dùng; liều tính ra không đổi.\n- Bản iPhone cập nhật cùng lúc.",
+ "versionCode": 15,
+ "versionName": "0.11.1",
+ "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.11.1/tdm-amg-0.11.1.apk",
+ "sha256": "fddb3f7219cf25d43d72fef0f27a1f97fc81702afab9d74eaaae8e4030f2f4b2",
+ "size": 49650185,
+ "notes": "TDM AMG 0.11.1\n\n- TDM Bayes (Tab 4 Vancomycin): «Tham số tiền nghiệm» và «Kết quả hậu nghiệm» mặc định thu gọn — bấm tiêu đề (▶) để xổ ra xem.\n- Tab 1 Bayesian: CL/Vd/Ke/OFV, thông tin η và nồng độ dự đoán tại từng điểm gom vào mục thu gọn «Tham số tiền nghiệm / Kết quả hậu nghiệm»; Cpeak/Ctrough/AUC24h hiện tại vẫn hiện sẵn.\n- Bỏ dòng chú thích định nghĩa AUC24h ngày TDM / AUC24h khi cân bằng.\n- Bản iPhone cập nhật cùng lúc.",
  "required": false,
  "date": "2026-10-22"
 }
