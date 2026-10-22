@@ -881,14 +881,18 @@ const BayesSteps = {
     }
     st.bayes = r;
     const cards = r.cards, cur = r.current;
-    const items = [['CL_post (L/h)', num(cards.cl, 4)], ['Vd_post / V1_post (L)', num(cards.vd, 2)], ['Ke (h⁻¹)', num(cards.ke, 4)], ['OFV_final', num(cards.ofv, 4)]];
+    const post = [['CL_post (L/h)', num(cards.cl, 4)], ['Vd_post / V1_post (L)', num(cards.vd, 2)], ['Ke (h⁻¹)', num(cards.ke, 4)], ['OFV_final', num(cards.ofv, 4)]];
+    const items = [];
     if (cur) items.push(['Cpeak hiện tại (μg/mL)', num(cur.cpeak, 2)], ['Ctrough hiện tại (μg/mL)', num(cur.ctrough, 2)],
       ['Liều đang dùng (mg)', g(cur.dose)], ['τ đang dùng (h)', g(cur.tau)], ['AUC24h khi cân bằng (mg·h/L)', optNum(cur, 'auc24', 1)],
       ['AUC24h/MIC khi cân bằng', optNum(cur, 'auc_mic', 1)]);
-    ui.metrics(box, items);
+    if (items.length) ui.metrics(box, items);
     if (cur) ui.hint(box, r.mic_note || '');
-    ui.text(box, r.eta_text || '', 13, Col.muted, false, 10);
-    ui.text(box, r.points_text || '', 13, Col.muted, false, 8);
+    // v0.11.1: tien nghiem (eta_text) + hau nghiem thu gon, bam de xem
+    const fb = ui.fold(ui.card(box), 'Tham số tiền nghiệm / Kết quả hậu nghiệm');
+    ui.metrics(fb, post);
+    ui.text(fb, r.eta_text || '', 13, Col.muted, false, 10);
+    ui.text(fb, r.points_text || '', 13, Col.muted, false, 8);
     if (r.chart) {
       const cc = ui.card(box);
       ui.header(cc, 'Đường cong nồng độ mô phỏng (hậu nghiệm)');
@@ -1058,21 +1062,17 @@ const VancoSteps = {
       ui.setStatus(status, r.message, r.level);
       if (r.priors) {
         const pr = r.priors;
-        const c = ui.card(box);
-        ui.header(c, 'Tham số tiền nghiệm — ' + vs.method);
+        const c = ui.fold(ui.card(box), 'Tham số tiền nghiệm — ' + vs.method);
         ui.metrics(c, [['CrCl (mL/phút)', String(pr.crcl ?? '')], ['CLprior (L/h)', String(pr.cl ?? '')], ['Vc,prior (L)', String(pr.vc ?? '')], ['Vp,prior (L)', String(pr.vp ?? '')]]);
         ui.text(c, pr.info || '', 12, Col.muted, false, 8);
       }
       if (!r.ok) return;
       const k = r.cards;
-      const c = ui.card(box);
-      ui.header(c, 'Kết quả hậu nghiệm');
+      const c = ui.fold(ui.card(box), 'Kết quả hậu nghiệm');
       ui.metrics(c, [['CL_optimized (L/h)', k.cl], ['Vc_optimized (L)', k.vc], ['Vp_optimized (L)', k.vp], ['C_pred_final (μg/mL)', k.cpred],
         ['OFV_final', k.ofv], ['k10 (h⁻¹)', k.k10], ['k12 (h⁻¹)', k.k12], ['k21 (h⁻¹)', k.k21], ['α (h⁻¹)', k.alpha], ['β (h⁻¹)', k.beta]].map(([a, b]) => [a, String(b ?? '')]));
       const c2 = ui.card(box);
       ui.header(c2, 'AUC24h');
-      ui.hint(c2, 'AUC24h ngày TDM = diện tích dưới đường cong trong 24 giờ thực tế của ngày lấy mẫu (từ liều kề trước mẫu đo). ' +
-        'AUC24h khi cân bằng = Liều × 24 / (τ × Clbn) — nếu tiếp tục LIỀU ĐANG DÙNG đến trạng thái cân bằng.');
       ui.metrics(c2, [['AUC24h ngày TDM (mg·h/L)', String(r.auc_day ?? '')], ['AUC24h khi cân bằng (mg·h/L)', String(r.auc_current ?? '')]]);
       ui.text(c2, r.auc_day_info || '', 12, Col.muted, false, 6);
       if (r.chart) {

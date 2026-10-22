@@ -51,6 +51,17 @@ const ui = {
   },
   header(parent, s) { const t = ui.text(parent, s, 17, Col.text, true, 14); t.style.marginBottom = '4px'; return t; },
   hint(parent, s) { const t = ui.text(parent, s, 13, Col.muted, false, 2); t.style.marginBottom = '4px'; return t; },
+  // v0.11.1: muc thu gon -- tieu de bam duoc (▶/▼), noi dung mac dinh an. Tra ve khung noi dung.
+  fold(parent, title, open = false) {
+    const head = ui.text(parent, '', 17, Col.blue, true, 14);
+    head.style.marginBottom = '4px'; head.style.cursor = 'pointer'; head.style.userSelect = 'none'; head.style.padding = '4px 0';
+    head.setAttribute('role', 'button');
+    const body = add(parent, ui.vbox());
+    const paint = (o) => { head.textContent = (o ? '▼ ' : '▶ ') + title; body.style.display = o ? '' : 'none'; };
+    paint(open);
+    head.addEventListener('click', () => paint(body.style.display === 'none'));
+    return body;
+  },
   levelColor(level, msg = '') {
     if (level === 'error') return Col.red;
     if (level === 'warn' || level === 'warning') return Col.amber;
