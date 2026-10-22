@@ -1,10 +1,10 @@
 {
- "versionCode": 15,
- "versionName": "0.11.1",
- "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.11.1/tdm-amg-0.11.1.apk",
- "sha256": "fddb3f7219cf25d43d72fef0f27a1f97fc81702afab9d74eaaae8e4030f2f4b2",
- "size": 49650185,
- "notes": "TDM AMG 0.11.1\n\n- TDM Bayes (Tab 4 Vancomycin): «Tham số tiền nghiệm» và «Kết quả hậu nghiệm» mặc định thu gọn — bấm tiêu đề (▶) để xổ ra xem.\n- Tab 1 Bayesian: CL/Vd/Ke/OFV, thông tin η và nồng độ dự đoán tại từng điểm gom vào mục thu gọn «Tham số tiền nghiệm / Kết quả hậu nghiệm»; Cpeak/Ctrough/AUC24h hiện tại vẫn hiện sẵn.\n- Bỏ dòng chú thích định nghĩa AUC24h ngày TDM / AUC24h khi cân bằng.\n- Bản iPhone cập nhật cùng lúc.",
+ "versionCode": 16,
+ "versionName": "0.11.2",
+ "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.11.2/tdm-amg-0.11.2.apk",
+ "sha256": "e9acd747f709ed498f15bd9c2f0e4d4fb039f4f6447fd09b70e9c7f66a1b1810",
+ "size": 49649193,
+ "notes": "TDM AMG 0.11.2\n\n- Tính liều kháng sinh — «Cách tính»: hiểu đúng công thức làm tròn bội số (ví dụ ROUND(W*15/250,0)*250 → «15 mg/kg (làm tròn bội 250 mg)»), không còn ghi nhầm «kết quả ÷ 250»; khoảng liều có trần ở số sau cũng hiện «tối đa».\n- Liều tính ra không đổi. Bản iPhone và phần mềm máy tính (Tab 2 quản lý bảng liều) dùng cùng bộ tính.",
  "required": false,
  "date": "2026-10-22"
 }
