@@ -1,10 +1,10 @@
 {
- "versionCode": 13,
- "versionName": "0.10.1",
- "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.10.1/tdm-amg-0.10.1.apk",
- "sha256": "399802da5e7e8815ec3cdbe6e698091f34809a66db27c1bfc324b2198b0e0295",
- "size": 49635209,
- "notes": "TDM AMG 0.10.1\n\n- Nhập liều (Tab 1 Sawchuk–Zaske, Tab 1 Bayesian, Tab 4 Vancomycin): thêm nút «📋 Nhập nhiều liều» — nhập giờ bắt đầu truyền liều đầu, τ, rồi giờ bắt đầu truyền liều cuối HOẶC số liều; app liệt kê từng liều để xác nhận (bỏ tick liều bị bỏ/trễ; liều trùng/chồng với liều đã có được bỏ tick sẵn) trước khi thêm hàng loạt.\n- Bỏ nút «Thêm liều thủ công» (đã có «➕ Liều kế tiếp» ở từng dòng liều).\n- Giống phần mềm máy tính bản 21/10/2026 và bản iPhone.",
+ "versionCode": 14,
+ "versionName": "0.11.0",
+ "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.11.0/tdm-amg-0.11.0.apk",
+ "sha256": "62aca9e5bf344d0b0b121cc9da29680b501d7a4c5d40f0408a0564a6dbdab3cf",
+ "size": 49649121,
+ "notes": "TDM AMG 0.11.0\n\n- TDM Bayes (Tab 4 Vancomycin): đổi tên và thứ tự 2 chỉ số AUC cho dễ hiểu — «AUC24h ngày TDM» (24 giờ thực tế của ngày lấy mẫu) đứng trước, rồi «AUC24h khi cân bằng» (nếu tiếp tục liều đang dùng). Liều mới: «AUC24h khi cân bằng – liều mới». Lịch sử: «AUC24h cân bằng».\n- Tab 1 Bayesian: «AUC24 hiện tại SS» → «AUC24h khi cân bằng»; «AUC24/MIC» → «AUC24h/MIC».\n- Tính liều kháng sinh: thuốc tính theo cân nặng (mg/kg) hiện thêm «🧮 Cách tính» — cân nặng tính liều (và quy tắc chọn), mức liều mg/kg (kèm liều tối đa), khoảng eCrCl/eGFR áp dụng, khoảng đưa liều. Tự sinh từ bảng liều nên luôn khớp bảng đang dùng; liều tính ra không đổi.\n- Bản iPhone cập nhật cùng lúc.",
  "required": false,
- "date": "2026-10-21"
+ "date": "2026-10-22"
 }
