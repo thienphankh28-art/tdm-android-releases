@@ -1,10 +1,10 @@
 {
- "versionCode": 17,
- "versionName": "0.12.0",
- "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.12.0/tdm-amg-0.12.0.apk",
- "sha256": "f665f001d7c4e0c376a0f7022a5771f1ceba35ef834dc84148af12f6d1bf87d1",
- "size": 49650521,
- "notes": "TDM AMG 0.12.0\n\n- Tính liều kháng sinh + chức năng thận: KHÔNG cần đăng nhập — mở ngay ở màn hình đầu. Chỉ cần đăng nhập để làm TDM (Tab 1, Tab 4) hoặc quản lý bảng liều (admin).\n- Chưa đăng nhập vẫn tự tải bảng liều mới nhất từ máy chủ (cần chạy SQL F1 một lần); mất mạng dùng bảng đã lưu trên máy.\n- Liều có liều nạp hiển thị tách dòng: «LD …» rồi «MD …». Nhiều chế độ liều (ngăn bằng «hay»/«hoặc») hiển thị «Chế độ 1: …», «Chế độ 2: …». Mục «Cách tính» cũng vậy. Nội dung liều không đổi.\n- Bản iPhone cập nhật cùng lúc.",
+ "versionCode": 18,
+ "versionName": "0.13.0",
+ "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.13.0/tdm-amg-0.13.0.apk",
+ "sha256": "95cdab2fe53b400942bb9b582be61f31eae07681589b0259baed1483caabf36d",
+ "size": 49648665,
+ "notes": "TDM AMG 0.13.0\n\n- Tab 4 Vancomycin, bước «Liều mới & dự đoán»: so sánh tối đa 5 phác đồ mới cùng phác đồ đang dùng, bấm «Tính dự đoán».\n- Ma trận so sánh: AUC24h ngày +1 → +4 và khi cân bằng, tô màu Thấp (< 400) / Đạt (400–600) / Cao (> 600).\n- Chạm 1 dòng để xem chi tiết: ngày TDM, ngày +1 → +5 và khi cân bằng (AUC24h, Cmin, đánh giá) kèm 1 câu kết luận.\n- Khoảng đưa liều không chia hết 24 h (vd q48h): hiển thị đúng giá trị từng ngày; khi cân bằng ghi khoảng thấp–cao, không lấy trung bình.\n- Cpred dự đoán tính theo phác đồ đang xem.\n- Bản iPhone cập nhật cùng lúc.",
  "required": false,
  "date": "2026-10-22"
 }
