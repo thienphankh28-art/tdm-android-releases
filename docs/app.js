@@ -1381,6 +1381,7 @@ const KsSteps = {
         .forEach(([lbl, k]) => { if (ct[k]) ui.text(c2, `• ${lbl}: ${ct[k]}`, 14, Col.text, false, 3).style.whiteSpace = 'pre-line'; });
     } else if (d.dong) ui.hint(c2, 'Áp dụng dòng: ' + d.dong);
     if (d.ghi_chu) ui.text(c2, '📝 ' + d.ghi_chu, 14, Col.amber, false, 4);
+    ui.text(c2, '📖 Nguồn tham khảo: ' + (d.nguon || 'Dược lâm sàng PNT'), 13, Col.muted, false, 6);
     ui.text(c2, '💧 Cách pha truyền', 15, Col.text, true, 14);
     this.phaRows(c2, d.pha_truyen);
   },
