@@ -1,10 +1,10 @@
 {
- "versionCode": 18,
- "versionName": "0.13.0",
- "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.13.0/tdm-amg-0.13.0.apk",
- "sha256": "95cdab2fe53b400942bb9b582be61f31eae07681589b0259baed1483caabf36d",
- "size": 49648665,
- "notes": "TDM AMG 0.13.0\n\n- Tab 4 Vancomycin, bước «Liều mới & dự đoán»: so sánh tối đa 5 phác đồ mới cùng phác đồ đang dùng, bấm «Tính dự đoán».\n- Ma trận so sánh: AUC24h ngày +1 → +4 và khi cân bằng, tô màu Thấp (< 400) / Đạt (400–600) / Cao (> 600).\n- Chạm 1 dòng để xem chi tiết: ngày TDM, ngày +1 → +5 và khi cân bằng (AUC24h, Cmin, đánh giá) kèm 1 câu kết luận.\n- Khoảng đưa liều không chia hết 24 h (vd q48h): hiển thị đúng giá trị từng ngày; khi cân bằng ghi khoảng thấp–cao, không lấy trung bình.\n- Cpred dự đoán tính theo phác đồ đang xem.\n- Bản iPhone cập nhật cùng lúc.",
+ "versionCode": 19,
+ "versionName": "0.14.0",
+ "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.14.0/tdm-amg-0.14.0.apk",
+ "sha256": "5cb5ed688d366640e698794823571eed421ba090f747b4e9a91c35f1a3ad074e",
+ "size": 49649129,
+ "notes": "TDM AMG 0.14.0\n\n- Tính liều kháng sinh: dưới chế độ liều hiện thêm dòng «📖 Nguồn tham khảo» của từng thuốc.\n- Toàn bộ bảng liều hiện có ghi nguồn «Dược lâm sàng PNT».\n- Admin (app và Tab 2 máy tính): thêm ô «Nguồn tham khảo cách tính liều» khi soạn thuốc. Để trống → tự ghi «Dược lâm sàng PNT». Tối đa 300 ký tự.\n- Liều không đổi. Không cần chạy SQL mới.\n- Bản iPhone cập nhật cùng lúc.",
  "required": false,
- "date": "2026-10-22"
+ "date": "2026-10-23"
 }
