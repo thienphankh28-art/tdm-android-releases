@@ -1,10 +1,10 @@
 {
- "versionCode": 19,
- "versionName": "0.14.0",
- "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.14.0/tdm-amg-0.14.0.apk",
- "sha256": "5cb5ed688d366640e698794823571eed421ba090f747b4e9a91c35f1a3ad074e",
- "size": 49649129,
- "notes": "TDM AMG 0.14.0\n\n- Tính liều kháng sinh: dưới chế độ liều hiện thêm dòng «📖 Nguồn tham khảo» của từng thuốc.\n- Toàn bộ bảng liều hiện có ghi nguồn «Dược lâm sàng PNT».\n- Admin (app và Tab 2 máy tính): thêm ô «Nguồn tham khảo cách tính liều» khi soạn thuốc. Để trống → tự ghi «Dược lâm sàng PNT». Tối đa 300 ký tự.\n- Liều không đổi. Không cần chạy SQL mới.\n- Bản iPhone cập nhật cùng lúc.",
+ "versionCode": 20,
+ "versionName": "0.15.0",
+ "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.15.0/tdm-amg-0.15.0.apk",
+ "sha256": "8a15d4e361c87f3b800f58ca1a612863ef398d43c9be66ea7f7f1d84ef739b63",
+ "size": 49650353,
+ "notes": "TDM AMG 0.15.0\n\n- Tính liều kháng sinh, mục «Cách tính»:\n  - công thức hiển thị giữ đúng dấu ngoặc;\n  - giá trị tính từ SCr/tuổi (vd CrCl riêng của thuốc, khoảng cách theo SCr) hiển thị đúng số, không đổi ra mg/kg;\n  - điều kiện dài ghi gọn «điều kiện riêng của thuốc»;\n  - dòng liều tự ghi «CN tính liều … kg» cho từng chế độ (nội trú / ICU) hiển thị đúng số kg.\n- Admin: thêm lựa chọn cân nặng tính liều «UpToDate: CN > 1,2 × CNLT → CNHC; còn lại CN thực».\n- Chuẩn bị cho bảng liều Amikacin mới (theo UpToDate: nội trú thường / ICU, khuyến khích TDM).\n- Liều các thuốc khác không đổi. Bản iPhone cập nhật cùng lúc.",
  "required": false,
- "date": "2026-10-23"
+ "date": "2026-10-24"
 }
