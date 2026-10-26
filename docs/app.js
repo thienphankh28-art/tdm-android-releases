@@ -401,7 +401,8 @@ class SzBlock {
       tinf: optStr(o, 't_inf_h', '1'), s1t: t(o.s1_time), s1c: optStr(o, 's1_conc'), s2t: t(o.s2_time), s2c: optStr(o, 's2_conc') });
   }
 }
-const ScrRow = (value = '80', unit = 'μmol/L', at = nowHourIso()) => ({ value, unit, at, toJson() { return { scr: this.value, unit: this.unit, measured_at: this.at }; } });
+// v0.16.0: ure (mmol/L, tuy chon) -- chi Komatsu 2025 (Tab 4) dung
+const ScrRow = (value = '80', unit = 'μmol/L', at = nowHourIso(), ure = '') => ({ value, unit, at, ure, toJson() { const o = { scr: this.value, unit: this.unit, measured_at: this.at }; if (String(this.ure || '').trim()) o.ure = this.ure; return o; } });
 const DoseRow = (at = nowHourIso(), dose = '400', tinf = '1', tau = '24') => ({ at, dose, tinf, tau, toJson() { return { given_at: this.at, dose_mg: this.dose, t_inf_h: this.tinf, tau_h: this.tau }; } });
 const MeasRow = (cobs = '', at = nowHourIso()) => ({ cobs, at, assign: '', warn: false, toJson() { return { c_obs: this.cobs, t_obs: this.at }; } });
 const NewDose = (dose = '', tau = '24', tinf = '1') => ({ dose, tau, tinf, result: '' });
@@ -468,10 +469,13 @@ class Tab1State {
 const VDoseRow = (at = nowHourIso(), dose = '1000', tau = '12', tinf = '1') => ({ at, dose, tau, tinf, toJson() { return { given_at: this.at, dose_mg: this.dose, tau_h: this.tau, t_inf_h: this.tinf }; } });
 const VMeasRow = (cobs = '15', at = nowHourIso(), groupNext = false) => ({ cobs, at, groupNext, toJson() { return { c_obs: this.cobs, t_obs: this.at, group_next: this.groupNext }; } });
 
+const KOMATSU = 'Komatsu 2025 (BMI ≥ 25)';   // v0.16.0
+
 class VancoState {
   constructor() {
     this.msyt = ''; this.gender = 'nam'; this.age = '50'; this.height = '165'; this.weight = '60';
     this.method = 'Goti 2018'; this.dialysis = false; this.malignancy = false; this.heelprick = false; this.gpos = true;
+    this.hf = false;
     this.scr = [ScrRow()]; this.doses = []; this.meas = [];
     this.newDose = '1000'; this.newTau = '12'; this.newTinf = '1'; this.target = '';
     this.result = null; this.newRes = null; this.history = null; this.selected = new Set();
@@ -481,7 +485,7 @@ class VancoState {
   }
   json() {
     return { msyt: this.msyt, gender: this.gender, age: this.age, height: this.height, weight: this.weight, method: this.method,
-      dialysis: this.dialysis, malignancy: this.malignancy, heelprick: this.heelprick, gpos: this.gpos,
+      dialysis: this.dialysis, malignancy: this.malignancy, heelprick: this.heelprick, gpos: this.gpos, hf: this.hf,
       new_dose: this.newDose, new_tau: this.newTau, scr: this.scr.map((r) => r.toJson()),
       doses: this.doses.map((r) => r.toJson()), measurements: this.meas.map((r) => r.toJson()) };
   }
@@ -490,8 +494,8 @@ class VancoState {
     if ('age' in f) this.age = optStr(f, 'age'); if ('height' in f) this.height = optStr(f, 'height');
     if ('weight' in f) this.weight = optStr(f, 'weight');
     this.method = f.method || this.method; this.dialysis = !!f.dialysis; this.malignancy = !!f.malignancy;
-    this.heelprick = !!f.heelprick; this.gpos = f.gpos === undefined ? true : !!f.gpos;
-    this.scr = (f.scr || []).map((o) => ScrRow(optStr(o, 'scr'), o.unit || 'μmol/L', o.measured_at || ''));
+    this.heelprick = !!f.heelprick; this.gpos = f.gpos === undefined ? true : !!f.gpos; this.hf = !!f.hf;
+    this.scr = (f.scr || []).map((o) => ScrRow(optStr(o, 'scr'), o.unit || 'μmol/L', o.measured_at || '', o.ure == null ? '' : optStr(o, 'ure')));
     this.doses = (f.doses || []).map((o) => VDoseRow(o.given_at || '', optStr(o, 'dose_mg'), optStr(o, 'tau_h', '12'), optStr(o, 't_inf_h', '1')));
     this.meas = (f.measurements || []).map((o) => VMeasRow(optStr(o, 'c_obs'), o.t_obs || '', !!o.group_next));
     if (!this.scr.length) this.scr.push(ScrRow()); if (!this.doses.length) this.doses.push(VDoseRow()); if (!this.meas.length) this.meas.push(VMeasRow());
@@ -1019,8 +1023,19 @@ const VancoSteps = {
     ui.choice(ui.cell(r1), 'Giới tính', ['nam', 'nữ'], vs.gender, (_, v) => { vs.gender = v; this.changed(); });
     ui.field(ui.cell(r1), 'Tuổi', vs.age, (v) => { vs.age = v; this.changed(); });
     const r2 = ui.row(c);
-    ui.field(ui.cell(r2), 'Chiều cao (cm)', vs.height, (v) => { vs.height = v; this.changed(); });
-    ui.field(ui.cell(r2), 'Cân nặng (kg)', vs.weight, (v) => { vs.weight = v; this.changed(); });
+    // v0.16.0: goi y Komatsu 2025 khi BMI >= 25 (cap nhat ngay khi go, khong tu doi mo hinh)
+    let hintTv = null, hintBtn = null;
+    const refreshHint = () => {
+      if (!hintTv) return;
+      const [txt, btn] = this.bmiHint();
+      hintTv.textContent = txt; hintTv.style.display = txt ? '' : 'none';
+      hintBtn.style.display = btn ? '' : 'none';
+    };
+    ui.field(ui.cell(r2), 'Chiều cao (cm)', vs.height, (v) => { vs.height = v; this.changed(); refreshHint(); });
+    ui.field(ui.cell(r2), 'Cân nặng (kg)', vs.weight, (v) => { vs.weight = v; this.changed(); refreshHint(); });
+    hintTv = ui.text(c, '', 13, '#9A6700', false, 6);
+    hintBtn = ui.smallButton(c, 'Dùng Komatsu 2025', '#8250DF', () => { vs.method = KOMATSU; this.changed(); redraw(); });
+    refreshHint();
     const c2 = ui.card(p);
     ui.choice(c2, '⚙️ Phương pháp tính Bayes', this.methods(), vs.method, (_, v) => { vs.method = v; this.changed(); redraw(); });
     ui.text(c2, (App.vmeta.population || {})[vs.method] || '', 13, Col.muted, false, 8);
@@ -1030,10 +1045,24 @@ const VancoSteps = {
     if (fl.includes('malignancy')) ui.check(c2, 'Bệnh máu ác tính (STDY10)', vs.malignancy, (b) => { vs.malignancy = b; this.changed(); });
     if (fl.includes('heelprick')) ui.check(c2, 'Mẫu lấy gót chân - Heel-prick (STDY13)', vs.heelprick, (b) => { vs.heelprick = b; this.changed(); });
     if (fl.includes('gpos')) ui.check(c2, 'Nhiễm khuẩn Gram dương (dis_gpos — Yamamoto)', vs.gpos, (b) => { vs.gpos = b; this.changed(); });
+    if (fl.includes('hf')) ui.check(c2, 'Suy tim (Komatsu 2025)', vs.hf, (b) => { vs.hf = b; this.changed(); });
+  },
+  // (thong bao, co hien nut "Dung Komatsu") -- giong _update_bmi_hint() cua Tab 4 v26.10.26b
+  bmiHint() {
+    const vs = App.vs;
+    const h = parseFloat(String(vs.height).replace(',', '.')) || 0, w = parseFloat(String(vs.weight).replace(',', '.')) || 0;
+    if (h <= 0 || w <= 0) return ['', false];
+    const bmi = w / Math.pow(h / 100, 2), b = bmi.toFixed(1), k = vs.method === KOMATSU;
+    if (!k && bmi >= 25) return [`💡 BMI = ${b} kg/m² (≥ 25). Gợi ý: cân nhắc mô hình Komatsu 2025 — xây dựng trên người lớn thừa cân/béo phì (BMI ≥ 25, Nhật Bản), dùng CN hiệu chỉnh, có thêm urê và suy tim.`, this.methods().includes(KOMATSU)];
+    if (k && bmi < 25) return [`⚠️ BMI = ${b} kg/m² < 25: ngoài dân số xây dựng mô hình Komatsu 2025 — nên dùng Goti 2018 hoặc Collin 2019.`, false];
+    if (k && bmi > 35) return [`⚠️ BMI = ${b} kg/m² > 35: rất ít bệnh nhân như vậy trong nghiên cứu Komatsu — kết quả kém tin cậy, nên lấy 2 mẫu (đỉnh + đáy).`, false];
+    return ['', false];
   },
   buildScr(p) {
     const vs = App.vs;
     ui.hint(p, 'Chọn đúng đơn vị SCr cho từng dòng — phần mềm quy đổi tự động sang mg/dL để tính toán.');
+    const useUre = (((App.vmeta.flags || {})[vs.method]) || []).includes('ure');
+    if (useUre) ui.hint(p, 'Komatsu 2025: nhập Urê (mmol/L) cùng lần xét nghiệm nếu có — mỗi lần TDM dùng urê gần thời điểm đo nhất.');
     vs.scr.forEach((r, i) => {
       const c = ui.card(p, 10);
       const head = headRow(c, `Lần đo SCr thứ ${i + 1}`);
@@ -1042,6 +1071,7 @@ const VancoSteps = {
       ui.field(ui.cell(r1), 'SCr', r.value, (v) => { r.value = v; this.changed(); });
       ui.choice(ui.cell(r1), 'Đơn vị', ['μmol/L', 'mg/dL'], r.unit, (_, v) => { r.unit = v; this.changed(); });
       ui.dateTime(c, 'Thời điểm đo', r.at, (v) => { r.at = v; this.changed(); });
+      if (useUre) ui.field(c, 'Urê (mmol/L, tùy chọn — để trống: BUN 19,3 mg/dL)', r.ure || '', (v) => { r.ure = v.trim(); this.changed(); });
     });
     ui.button(p, '➕ Thêm lần đo SCr', Col.blue, 12, () => {
       const last = vs.scr[vs.scr.length - 1];
