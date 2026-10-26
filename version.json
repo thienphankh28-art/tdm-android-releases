@@ -1,10 +1,10 @@
 {
- "versionCode": 20,
- "versionName": "0.15.0",
- "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.15.0/tdm-amg-0.15.0.apk",
- "sha256": "8a15d4e361c87f3b800f58ca1a612863ef398d43c9be66ea7f7f1d84ef739b63",
- "size": 49650353,
- "notes": "TDM AMG 0.15.0\n\n- Tính liều kháng sinh, mục «Cách tính»:\n  - công thức hiển thị giữ đúng dấu ngoặc;\n  - giá trị tính từ SCr/tuổi (vd CrCl riêng của thuốc, khoảng cách theo SCr) hiển thị đúng số, không đổi ra mg/kg;\n  - điều kiện dài ghi gọn «điều kiện riêng của thuốc»;\n  - dòng liều tự ghi «CN tính liều … kg» cho từng chế độ (nội trú / ICU) hiển thị đúng số kg.\n- Admin: thêm lựa chọn cân nặng tính liều «UpToDate: CN > 1,2 × CNLT → CNHC; còn lại CN thực».\n- Chuẩn bị cho bảng liều Amikacin mới (theo UpToDate: nội trú thường / ICU, khuyến khích TDM).\n- Liều các thuốc khác không đổi. Bản iPhone cập nhật cùng lúc.",
+ "versionCode": 21,
+ "versionName": "0.15.1",
+ "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.15.1/tdm-amg-0.15.1.apk",
+ "sha256": "22a94c9c7a39727f91af920337b6e6fc6d5497cd2a099e34d5139d46847eadfd",
+ "size": 49649869,
+ "notes": "TDM AMG 0.15.1\n\n- Đồ thị nồng độ (Vancomycin, Aminoglycosid):\n  - khi đồ thị dài hơn 3 ngày: chạm vào đồ thị để chuyển giữa «Toàn bộ» và «3 ngày cuối»;\n  - trục thời gian ghi theo ngày (dd/MM) khi dài hơn 2 ngày, dễ đọc hơn khi có nhiều dòng liều.\n- Cùng thay đổi với bản máy tính (Tab 4 v26.10.26: đồ thị không còn bị ép dẹt).\n- Cách tính liều và kết quả không đổi. Bản iPhone cập nhật cùng lúc.",
  "required": false,
- "date": "2026-10-24"
+ "date": "2026-10-26"
 }
