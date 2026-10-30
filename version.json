@@ -1,10 +1,10 @@
 {
- "versionCode": 22,
- "versionName": "0.16.0",
- "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.16.0/tdm-amg-0.16.0.apk",
- "sha256": "fcf440ecee8ae48e3acf5d9fa86bddf2441df793187fc1519831bbc4d84237fb",
- "size": 49650081,
- "notes": "TDM AMG 0.16.0\n\n- TDM Vancomycin: thêm mô hình «Komatsu 2025 (BMI ≥ 25)» cho người lớn thừa cân / béo phì\n  (Komatsu, J Infect Chemother 2025; 184 BN Nhật Bản, có ngoại kiểm):\n  - CCr tính theo CN hiệu chỉnh; CL phụ thuộc thêm urê (BUN) và suy tim; Vc, Vp theo CN hiệu chỉnh; Q = 2,0 L/h;\n  - ô «Suy tim» và ô «Urê (mmol/L)» ở từng lần đo SCr (để trống được — khi đó dùng BUN 19,3 mg/dL và có cảnh báo);\n  - khi BMI ≥ 25 mà đang dùng mô hình khác: hiện gợi ý + nút «Dùng Komatsu 2025» (không tự đổi);\n  - khi chọn Komatsu mà BMI < 25 hoặc > 35: cảnh báo ngoài dân số nghiên cứu.\n- Kết quả Goti 2018 / Collin 2019 / các mô hình Tucuxi không đổi.\n- Cùng thay đổi với bản máy tính (Tab 4 v26.10.26b). Bản iPhone cập nhật cùng lúc.",
+ "versionCode": 23,
+ "versionName": "0.17.0",
+ "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.17.0/tdm-amg-0.17.0.apk",
+ "sha256": "ce49b546206464aac06679412663126985b2682c2aa4a6ab6addfafc68a2ec64",
+ "size": 49681493,
+ "notes": "TDM AMG 0.17.0\n\n- Ghi nhớ đăng nhập trên máy này (14 ngày):\n  - ô «Ghi nhớ đăng nhập trên máy này» ở màn hình đăng nhập — MẶC ĐỊNH TẮT, chỉ bật trên điện thoại cá nhân;\n  - đã bật thì các lần mở app sau vào thẳng trang chính, không cần gõ mật khẩu;\n  - hết hạn sau 14 ngày không mở app; nút «Đăng xuất» bỏ ghi nhớ;\n  - không lưu mật khẩu: chỉ lưu một mã ngẫu nhiên, mã hóa bằng khóa Android Keystore;\n  - quản trị viên xem và thu hồi được từng thiết bị (Tab 3 bản máy tính); đổi mật khẩu cũng tự thu hồi.\n- Cần máy chủ đã chạy SQL C4. Chưa chạy thì app vẫn đăng nhập bình thường, chỉ báo chưa ghi nhớ được.\n- Cùng thay đổi với bản máy tính V.2.8.2. Bản iPhone cập nhật cùng lúc.",
  "required": false,
- "date": "2026-10-26"
+ "date": "2026-10-30"
 }
