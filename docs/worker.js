@@ -58,9 +58,9 @@ def _transport(method, url, headers, body):
         return 0, "mất kết nối mạng"
     return int(x.status), str(x.responseText)
 
-def pwa_setup(url, key, token, user, pw, role):
+def pwa_setup(url, key, token, user, pw, role, remember=None):
     mobile_db.configure(url, key, _transport)
-    mobile_db._SESSION.update(token=token, u=user, p=pw, gateway=bool(token), role=role or "")
+    mobile_db._SESSION.update(token=token, u=user, p=pw, gateway=bool(token), role=role or "", remember=remember or None)
 
 def pwa_logout():
     mobile_db.logout()
@@ -87,7 +87,7 @@ async function handle(msg) {
     case 'engine':
       installEngine(msg.zip);
       py.runPython(GLUE);
-      py.globals.get('pwa_setup')(msg.url, msg.key, msg.token, msg.user, msg.pw, msg.role);
+      py.globals.get('pwa_setup')(msg.url, msg.key, msg.token, msg.user, msg.pw, msg.role, msg.remember || null);
       return { installed: true };
     case 'ks_engine':          // v0.12.0: goi tinh lieu KS (chua dang nhap) -- khong ma phien
       installEngine(msg.zip);

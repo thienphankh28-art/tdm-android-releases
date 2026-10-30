@@ -1,8 +1,8 @@
 // sw.js -- Service Worker: luu san giao dien + Python (Pyodide) de mo nhanh va dung duoc khi mat mang.
 // * Giao dien + manifest bo tinh: lay MANG TRUOC (luon nhan ban moi nhat), mat mang -> dung ban da luu.
 // * Pyodide (ten file co so phien ban) + goi bo tinh (engine-<phien ban>.bin): lay BO NHO TRUOC.
-// 20261026-20110a54-aa06c4 duoc tools/pwa_build.py thay bang ma phien ban -> moi lan dang ban moi, cache cu duoc don.
-const BUILD = '20261026-20110a54-aa06c4';
+// 20261030-a8d3ec68-a75c21 duoc tools/pwa_build.py thay bang ma phien ban -> moi lan dang ban moi, cache cu duoc don.
+const BUILD = '20261030-a8d3ec68-a75c21';
 const SHELL = 'tdm-shell-' + BUILD;
 const BIG = 'tdm-big-v1';
 self.addEventListener('install', (e) => { self.skipWaiting(); });

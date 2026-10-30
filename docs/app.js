@@ -94,6 +94,7 @@ const Secure = {
       await IDB.set(name, { iv, ct });
     } catch (e) { /* luu that bai -> lan sau tai lai tu may chu */ }
   },
+  async del(name) { try { await IDB.del(name); } catch (e) { /* bo qua */ } },
   async load(name) {
     try {
       const v = await IDB.get(name);
@@ -123,7 +124,7 @@ async function loadEngine(session) {
   await ensureRuntime();
   setBusyText('Đang cài bộ tính…');
   await callWorker('engine', { zip: new Uint8Array(zip), url: CFG.url, key: CFG.key, token: session.token,
-    user: session.user, pw: session.pw, role: session.role }, []);
+    user: session.user, pw: session.pw, role: session.role, remember: session.remember || null }, []);
   engineInfo = man;
 }
 
@@ -193,6 +194,42 @@ const AppInfo = {
     'trước khi áp dụng. Tác giả không chịu trách nhiệm đối với các quyết định điều trị dựa trên kết quả của phần mềm.',
 };
 
+// v0.17.0: ghi nho dang nhap tren may (SQL C4). KHONG luu mat khau: chi luu "ma ghi nho" ma hoa AES-GCM (Secure).
+let loginNotice = '';
+const deviceName = () => {
+  const ua = navigator.userAgent || '';
+  const m = ua.match(/\(([^;)]+)/);
+  return ((/iPhone|iPad/.test(ua) ? 'iPhone/iPad' : (m ? m[1] : 'Trình duyệt')) + ' — web').slice(0, 100);
+};
+async function tryResume() {
+  const tok = await Secure.load('remember');
+  if (!tok) { showLogin(); return; }
+  page('TDM Aminoglycosid', 'Đang đăng nhập tự động…', false);
+  busy(true);
+  ensureRuntime().catch(() => {});
+  try {
+    const rows = await rpc('amg_remember_resume', { p_remember: tok, p_rotate: true });
+    const row = Array.isArray(rows) ? rows[0] : rows;
+    if (!row || !row.token) {
+      await Secure.del('remember');
+      busy(false); loginNotice = 'ℹ️ Phiên ghi nhớ đã hết hạn hoặc bị thu hồi — vui lòng đăng nhập lại.'; showLogin(); return;
+    }
+    await Secure.save('remember', row.remember_token);
+    const session = { token: row.token, user: row.username, pw: null, role: row.role || '', remember: row.remember_token };
+    await loadEngine(session);
+    App.user = { username: row.username, fullname: row.fullname || row.username, role: row.role || '' };
+    App.remembered = true;
+    busy(false);
+    showHome();
+  } catch (e) {
+    busy(false);
+    if (/PGRST202|Could not find the function/.test(e.message)) await Secure.del('remember');
+    const offline = !navigator.onLine || /Failed to fetch|NetworkError|Load failed/i.test(e.message);
+    loginNotice = offline ? '❌ Không kết nối được máy chủ để đăng nhập tự động — kiểm tra mạng.' : '❌ ' + e.message;
+    showLogin();
+  }
+}
+
 function showLogin() {
   App.stepIdx = -2;
   const body = page('TDM Aminoglycosid', 'Tính liều kháng sinh · Đăng nhập để làm TDM', false);
@@ -217,7 +254,12 @@ function showLogin() {
   let p = '';
   ui.field(c, 'Tên đăng nhập', u, (v) => { u = v; }, { numeric: false, autocomplete: 'username' });
   const pw = ui.field(c, 'Mật khẩu', '', (v) => { p = v; }, { numeric: false, password: true, autocomplete: 'current-password' });
+  // v0.17.0: ghi nho dang nhap -- MAC DINH TAT
+  let remember = false;
+  ui.check(c, 'Ghi nhớ đăng nhập trên máy này (14 ngày)', false, (v) => { remember = v; });
+  ui.hint(c, 'Chỉ bật trên điện thoại cá nhân, không bật trên máy dùng chung. Đăng xuất để bỏ ghi nhớ.');
   const status = ui.status(c);
+  if (loginNotice) { ui.setStatus(status, loginNotice, 'warn'); loginNotice = ''; }
   const go = async () => {
     u = u.trim();
     if (!u || !p) { ui.setStatus(status, '⚠️ Nhập tên đăng nhập và mật khẩu.', 'warn'); return; }
@@ -227,7 +269,19 @@ function showLogin() {
       const rows = await rpc('amg_login_session', { p_username: u, p_password: p });
       const row = Array.isArray(rows) ? rows[0] : rows;
       if (!row || !row.token) { busy(false); ui.setStatus(status, '❌ Sai tên đăng nhập hoặc mật khẩu.', 'error'); return; }
-      const session = { token: row.token, user: u, pw: p, role: row.role || '' };
+      const session = { token: row.token, user: u, pw: p, role: row.role || '', remember: null };
+      const old = await Secure.load('remember');
+      if (old) { rpc('amg_remember_revoke', { p_remember: old }).catch(() => {}); await Secure.del('remember'); }
+      App.remembered = false;
+      if (remember) {
+        try {
+          const rr = await rpc('amg_remember_issue', { p_token: row.token, p_device: deviceName(), p_platform: 'web' });
+          const r0 = Array.isArray(rr) ? rr[0] : rr;
+          if (r0 && r0.remember_token) { session.remember = r0.remember_token; await Secure.save('remember', r0.remember_token); App.remembered = true; }
+        } catch (e) {
+          toast(/PGRST202|Could not find the function/.test(e.message) ? 'Máy chủ chưa có chức năng ghi nhớ (cần chạy SQL C4).' : 'Không ghi nhớ được đăng nhập trên máy này.');
+        }
+      }
       await loadEngine(session);
       App.user = { username: u, fullname: row.fullname || u, role: row.role || '' };
       try { localStorage.setItem('tdm_user', u); } catch (e) { /* bo qua */ }
@@ -321,6 +375,7 @@ function showHome() {
 
   const c3 = ui.card(body, 18);
   ui.hint(c3, `Bản iPhone (web) — tự cập nhật khi mở. Bộ tính phiên bản ${engineInfo ? engineInfo.version : '?'}.`);
+  if (App.remembered) ui.hint(c3, '🔒 Đăng nhập được ghi nhớ trên máy này (14 ngày kể từ lần dùng cuối). Đăng xuất để bỏ ghi nhớ.');
   const chk = ui.status(c3);
   const r = ui.row(c3);
   ui.smallButton(r, 'Kiểm tra bộ tính (ca mẫu)', Col.gray, () => {
@@ -334,7 +389,8 @@ function showHome() {
   });
   ui.smallButton(r, 'Đăng xuất', Col.red, () => {
     busy(true);
-    callWorker('logout').finally(() => {
+    callWorker('logout').finally(async () => {
+      await Secure.del('remember'); App.remembered = false;
       busy(false);
       App.user = null; App.st = null; App.vs = null; App.ks = null; App.amgStarted = false; App.vancoStarted = false;
       showLogin();
@@ -1448,4 +1504,4 @@ if ('serviceWorker' in navigator) {
 if (!CFG.url || !CFG.key) {
   page('TDM Aminoglycosid', 'Lỗi cấu hình', false);
   ui.text($('body'), '❌ Bản build này chưa có địa chỉ máy chủ (thiếu config.js).', 15, Col.red);
-} else showLogin();
+} else tryResume();
