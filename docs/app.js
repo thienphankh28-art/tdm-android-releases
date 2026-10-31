@@ -432,7 +432,7 @@ function back() { if (App.stepIdx > 0) go(App.stepIdx - 1); else if (App.stepIdx
 function saveWithConfirm(fn, req, status, after = () => {}) {
   py(fn, req, (r) => {
     if (r.need_confirm) {
-      if (confirm('Xác nhận ghi đè\n\n' + r.message)) {
+      if (confirm('Xác nhận lưu\n\n' + r.message)) {
         req.overwrite = true;
         py(fn, req, (r2) => { ui.setStatus(status, r2.message, r2.level); after(r2); });
       } else ui.setStatus(status, 'Đã hủy thao tác lưu.', 'info');
@@ -471,6 +471,7 @@ class Tab1State {
     this.doseMgKg = '5'; this.pop = null; this.blocks = [new SzBlock()];
     this.szCalc = null; this.checkMsg = ''; this.checkLevel = 'info';
     this.newDose = '400'; this.newTau = '36'; this.newTinf = '1'; this.sz4 = null; this.cycles = 10;
+    this.prevRegimen = null; this.calcMsyt = '';   // v0.18.0: phác đồ lần trước; MSYT lúc tính (chống lưu nhầm)
     this.setting = ''; this.albumin = ''; this.urineCrcl = '';
     this.cf = false; this.ntm = false; this.openAbdomen = false; this.crrt = false; this.vanco = false;
     this.auto = true; this.modelKey = 'AA2020'; this.models = null;
@@ -505,7 +506,10 @@ class Tab1State {
       this.doseMgKg = optStr(f, 'dose_mg_kg', this.doseMgKg); this.targetCp = optStr(f, 'target_cp', this.targetCp);
       this.targetCtr = optStr(f, 'target_ctr', this.targetCtr);
       if (Array.isArray(f.blocks)) { this.blocks = f.blocks.map(SzBlock.fromJson); if (!this.blocks.length) this.blocks.push(new SzBlock()); }
-      this.szCalc = null; this.sz4 = null; this.checkMsg = '';
+      this.szCalc = null; this.sz4 = null; this.checkMsg = ''; this.calcMsyt = '';
+      this.prevRegimen = f.prev_regimen || null;
+      if ('new_dose' in f) this.newDose = optStr(f, 'new_dose'); if ('new_tau' in f) this.newTau = optStr(f, 'new_tau');
+      if ('new_t_inf' in f) this.newTinf = optStr(f, 'new_t_inf');
     } else {
       this.modelKey = f.model_key || this.modelKey; this.auto = !!f.auto;
       const c = f.clinical;
@@ -696,8 +700,33 @@ const SzSteps = {
     return (x && y) ? ` = ${num((y - x) / 3600000, 2)} h kể từ lúc bắt đầu truyền` : '';
   },
   changed() { App.st.szCalc = null; App.st.sz4 = null; },
+  prevRegimenText(rg) {     // v0.18.0 (giống bản máy tính V31.10.26)
+    const n = (k, d) => (rg[k] === null || rg[k] === undefined) ? null : num(Number(rg[k]), d);
+    const pred = [n('cp_pred', 1) && 'Cp ' + n('cp_pred', 1), n('ctr_pred', 2) && 'Ctr ' + n('ctr_pred', 2),
+      n('auc24_pred', 1) && 'AUC24 ' + n('auc24_pred', 1)].filter(Boolean);
+    return `📌 Lần TDM trước${rg.date ? ' (' + rg.date + ')' : ''} đã chọn: ${g(Number(rg.dose))} mg q${g(Number(rg.tau || 0))}h` +
+      (rg.t_inf ? `, truyền ${g(Number(rg.t_inf))} h` : '') + (pred.length ? ` → ${pred.join(' · ')} (dự đoán lúc đó)` : '');
+  },
   buildBlocks(p) {
     const st = App.st;
+    if (st.prevRegimen) {
+      const rg = st.prevRegimen, c = ui.card(p, 4);
+      ui.text(c, this.prevRegimenText(rg), 14, Col.amber, true);
+      ui.button(c, '➕ Thêm các liều theo phác đồ này', Col.blue, 8, () => {
+        const valid = st.blocks.filter((b) => parseIso(b.start) && toNum(b.tau) !== null);
+        const last = lastByTime(valid, (b) => b.start);
+        // người dùng TỰ NHẬP giờ truyền liều đầu của phác đồ (không tự điền) — yêu cầu 31/10
+        multiDose({ first: '', dose: g(Number(rg.dose)), tau: g(Number(rg.tau || 24)), tinf: g(Number(rg.t_inf || 1)),
+          scr: last ? (last.scr || '80') : '80', existing: valid.map((b) => [b.start, b.tinf]),
+          onAdd: (times, dose, t, tinf, scr) => {
+            if (st.blocks.length === 1 && !valid.length) st.blocks = [];
+            times.forEach((at) => st.blocks.push(new SzBlock({ start: at, scr, dose, tau: t, tinf })));
+            st.blocks.sort((x, y) => (parseIso(x.start) || new Date(8.64e15)) - (parseIso(y.start) || new Date(8.64e15)));
+            this.changed(); redraw(); toast(`Đã thêm ${times.length} liều.`);
+          } });
+      });
+      ui.hint(c, 'Nhập thời điểm THỰC TẾ bắt đầu truyền liều đầu tiên của phác đồ này trong hộp thoại.');
+    }
     ui.hint(p, 'Nhập LẦN LƯỢT từng liều thực tế (kể cả liều không lấy máu). Với liều có lấy máu, nhập thêm 2 thời điểm định lượng + nồng độ. Phần mềm tự sắp theo thời gian, tự cộng dồn tồn dư các liều trước.');
     st.blocks.forEach((b, i) => {
       const c = ui.card(p, 10);
@@ -765,10 +794,8 @@ const SzSteps = {
       }
       ui.hint(box, r.which || '');
       this.showPerBlock(box);
-      const sv = ui.status(box);
-      ui.button(box, '💾 Xác nhận & Lưu lên Cloud (kết quả cá thể hóa)', Col.greenBtn, 14, () => {
-        saveWithConfirm('sz_save3', Object.assign(st.szJson(), { sec3: s, results: r.results || {} }), sv);
-      });
+      st.calcMsyt = st.msyt;
+      ui.hint(box, 'Lưu lên Cloud ở bước «Hiệu chỉnh liều» (lưu chung kết quả này + phác đồ mới).');
     });
   },
   showPerBlock(box) {
@@ -784,9 +811,10 @@ const SzSteps = {
     if (!calc) { ui.text(p, '❌ Chưa có kết quả cá thể hóa hợp lệ — quay lại bước trước.', 15, Col.red, false, 12); return; }
     const c = ui.card(p);
     const r1 = ui.row(c);
-    ui.field(ui.cell(r1), 'Liều mới (mg)', st.newDose, (v) => { st.newDose = v; });
-    ui.field(ui.cell(r1), 'τ mới (h)', st.newTau, (v) => { st.newTau = v; });
-    ui.field(c, "Thời gian truyền mới t' (h)", st.newTinf, (v) => { st.newTinf = v; });
+    if (st.prevRegimen) ui.text(c, this.prevRegimenText(st.prevRegimen), 13, Col.amber, false, 0);
+    ui.field(ui.cell(r1), 'Liều mới (mg)', st.newDose, (v) => { st.newDose = v; st.sz4 = null; });
+    ui.field(ui.cell(r1), 'τ mới (h)', st.newTau, (v) => { st.newTau = v; st.sz4 = null; });
+    ui.field(c, "Thời gian truyền mới t' (h)", st.newTinf, (v) => { st.newTinf = v; st.sz4 = null; });
     const status = ui.status(c);
     const res = add(c, ui.vbox());
     let chartBox;
@@ -811,12 +839,14 @@ const SzSteps = {
     ui.choice(cc, 'Số chu kỳ', Array.from({ length: 19 }, (_, i) => String(i + 2)), String(st.cycles), (_, v) => { st.cycles = +v; compute(); });
     chartBox = add(cc, ui.vbox());
     const sv = ui.status(p);
-    ui.button(p, '💾 Xác nhận & Lưu phác đồ mới lên Cloud', Col.greenBtn, 14, () => {
-      const s4 = st.sz4;
-      if (!s4) { ui.setStatus(sv, '⚠️ Vui lòng tính liều mới trước.', 'warn'); return; }
-      saveWithConfirm('sz_save4', Object.assign(st.szJson(), { sec3: calc.sec3, sec4: { cp_pred: s4.cp_pred, ctr_pred: s4.ctr_pred },
-        new_dose: st.newDose, new_tau: st.newTau, new_t_inf: st.newTinf }), sv);
+    const dd = String(calc.sec3.date || '');
+    const day = dd.length >= 10 ? `${dd.slice(8, 10)}/${dd.slice(5, 7)}/${dd.slice(0, 4)}` : dd;
+    // v0.18.0: MỘT nút lưu = kết quả cá thể hóa + phác đồ đã chọn (giống bản máy tính V31.10.26)
+    ui.button(p, `💾 Lưu TDM lên Cloud — bản ghi ngày ${day}`, Col.greenBtn, 14, () => {
+      saveWithConfirm('sz_save', Object.assign(st.szJson(), { sec3: calc.sec3, calc_msyt: st.calcMsyt, with_regimen: !!st.sz4,
+        new_dose: st.newDose, new_tau: st.newTau, new_t_inf: st.newTinf, cycles: st.cycles }), sv);
     });
+    ui.hint(p, 'Lưu kết quả cá thể hóa + phác đồ vừa tính ở trên. Chưa tính phác đồ vẫn lưu được (phần mềm hỏi lại). Mỗi ngày TDM là 1 bản ghi, lưu lại cùng ngày sẽ ghi đè.');
     compute();
   },
 };
@@ -979,7 +1009,11 @@ const BayesSteps = {
     }
     st.bayes = r;
     const cards = r.cards, cur = r.current;
-    const post = [['CL_post (L/h)', num(cards.cl, 4)], ['Vd_post / V1_post (L)', num(cards.vd, 2)], ['Ke (h⁻¹)', num(cards.ke, 4)], ['OFV_final', num(cards.ofv, 4)]];
+    // v0.18.0: mô hình 2 ngăn -> V1 · V2 · β; 1 ngăn -> Vd · Ke
+    const post = (cards.n_cmt === 2 && cards.v2 !== undefined)
+      ? [['CL_post (L/h)', num(cards.cl, 4)], ['V1_post (L)', num(cards.vd, 2)], ['V2_post (L)', num(cards.v2, 2)],
+        ['β (h⁻¹)', optNum(cards, 'beta', 4)], ['OFV_final', num(cards.ofv, 4)]]
+      : [['CL_post (L/h)', num(cards.cl, 4)], ['Vd_post (L)', num(cards.vd, 2)], ['Ke (h⁻¹)', num(cards.ke, 4)], ['OFV_final', num(cards.ofv, 4)]];
     const items = [];
     if (cur) items.push(['Cpeak hiện tại (μg/mL)', num(cur.cpeak, 2)], ['Ctrough hiện tại (μg/mL)', num(cur.ctrough, 2)],
       ['Liều đang dùng (mg)', g(cur.dose)], ['τ đang dùng (h)', g(cur.tau)], ['AUC24h khi cân bằng (mg·h/L)', optNum(cur, 'auc24', 1)],
@@ -1052,7 +1086,9 @@ const BayesSteps = {
     if (!Array.isArray(h) || !h.length) { ui.hint(box, 'Chưa có (tải bằng MSYT ở Trang chính hoặc sau khi lưu).'); return; }
     h.forEach((o) => {
       const d = (k, n) => (o[k] === null || o[k] === undefined) ? '--' : num(Number(o[k]), n);
-      const t = ui.text(box, `${o.date || ''} · ${o.model || ''}\n   CL ${d('cl', 3)} · V ${d('vd', 2)} · Cpeak ${d('cpeak', 2)} · Ctrough ${d('ctrough', 2)} · Liều/τ ${o.dose_tau || ''}`, 13, Col.text, false, 6);
+      const head = [o.date, o.saved_at ? 'lưu ' + o.saved_at : '', o.drug, o.model].filter(Boolean).join(' · ');
+      const vtxt = o.n_cmt === 2 ? `V1 ${d('vd', 2)} · V2 ${d('v2', 2)}` : `V ${d('vd', 2)}`;
+      const t = ui.text(box, `${head}\n   CL ${d('cl', 3)} · ${vtxt} · Cpeak ${d('cpeak', 2)} · Ctrough ${d('ctrough', 2)} · Liều/τ ${o.dose_tau || ''}`, 13, Col.text, false, 6);
       t.style.whiteSpace = 'pre-line';
     });
   },
@@ -1329,7 +1365,7 @@ const VancoSteps = {
     if (!Array.isArray(h) || !h.length) { ui.hint(box, 'Chưa có kết quả nào.'); return; }
     h.forEach((o, i) => {
       const d = (k, n) => (o[k] === null || o[k] === undefined) ? '--' : num(Number(o[k]), n);
-      const cb = ui.check(box, `${o.date || ''} · ${o.method || ''}\nCL ${d('cl', 4)} · Vc ${d('vc', 2)} · Vp ${d('vp', 2)} · AUC24h cân bằng ${d('auc', 2)}`, vs.selected.has(i),
+      const cb = ui.check(box, `${o.date || ''}${o.saved_at ? ' (lưu ' + o.saved_at + ')' : ''} · ${o.method || ''}\nCL ${d('cl', 4)} · Vc ${d('vc', 2)} · Vp ${d('vp', 2)} · AUC24h cân bằng ${d('auc', 2)}`, vs.selected.has(i),
         (b) => { if (b) vs.selected.add(i); else vs.selected.delete(i); });
       cb.parentNode.style.whiteSpace = 'pre-line';
     });
@@ -1340,7 +1376,7 @@ const VancoSteps = {
     if (!h) return;
     const rows = [...vs.selected].sort((a, b) => a - b).map((i) => h[i]);
     if (!rows.length) { ui.setStatus(st, '⚠️ Chưa chọn dòng dữ liệu nào để xóa.', 'warn'); return; }
-    const dates = rows.map((o) => `  • ${o.date} (${o.method})`).join('\n');
+    const dates = rows.map((o) => `  • ${o.date} (${o.method}${o.saved_at ? ', lưu ' + o.saved_at : ''})`).join('\n');
     if (!confirm(`Bạn sắp xóa ${rows.length} lần TDM Vancomycin của bệnh nhân ${vs.msyt}:\n${dates}\n\nTiếp tục?`)) return;
     if (!confirm('⚠️ Hành động này KHÔNG THỂ HOÀN TÁC. Dữ liệu sẽ bị xóa vĩnh viễn trên Cloud.\n\nBạn có chắc chắn muốn xóa?')) return;
     py('v_delete', { msyt: vs.msyt, rows }, (r) => {
