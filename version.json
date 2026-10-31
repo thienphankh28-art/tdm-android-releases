@@ -1,10 +1,10 @@
 {
- "versionCode": 23,
- "versionName": "0.17.0",
- "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.17.0/tdm-amg-0.17.0.apk",
- "sha256": "ce49b546206464aac06679412663126985b2682c2aa4a6ab6addfafc68a2ec64",
- "size": 49681493,
- "notes": "TDM AMG 0.17.0\n\n- Ghi nhớ đăng nhập trên máy này (14 ngày):\n  - ô «Ghi nhớ đăng nhập trên máy này» ở màn hình đăng nhập — MẶC ĐỊNH TẮT, chỉ bật trên điện thoại cá nhân;\n  - đã bật thì các lần mở app sau vào thẳng trang chính, không cần gõ mật khẩu;\n  - hết hạn sau 14 ngày không mở app; nút «Đăng xuất» bỏ ghi nhớ;\n  - không lưu mật khẩu: chỉ lưu một mã ngẫu nhiên, mã hóa bằng khóa Android Keystore;\n  - quản trị viên xem và thu hồi được từng thiết bị (Tab 3 bản máy tính); đổi mật khẩu cũng tự thu hồi.\n- Cần máy chủ đã chạy SQL C4. Chưa chạy thì app vẫn đăng nhập bình thường, chỉ báo chưa ghi nhớ được.\n- Cùng thay đổi với bản máy tính V.2.8.2. Bản iPhone cập nhật cùng lúc.",
+ "versionCode": 24,
+ "versionName": "0.18.0",
+ "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.18.0/tdm-amg-0.18.0.apk",
+ "sha256": "70dfbc08ef58944fb1127d7ef02954e7980ece4e515a25560da71d866ee95491",
+ "size": 49682845,
+ "notes": "TDM AMG 0.18.0\n\n- Sawchuk–Zaske: chỉ còn 1 nút «💾 Lưu TDM lên Cloud» ở bước Hiệu chỉnh liều. Nút này lưu chung kết quả cá thể hóa và phác đồ vừa tính. Chưa tính phác đồ vẫn lưu được (app hỏi lại).\n- Khi tải bệnh nhân, app hiện dòng «📌 Lần TDM trước đã chọn: … mg q…h» và điền sẵn bước Hiệu chỉnh liều. Nút «➕ Thêm các liều theo phác đồ này» thêm liều; người dùng tự nhập giờ truyền thực tế của liều đầu.\n- Bayesian mô hình 2 ngăn (Carrié, Jin, Smit…): hiện V1 · V2 · β thay cho Vd · Ke. Lịch sử có thêm giờ lưu và tên thuốc.\n- Lưu thêm chi tiết mỗi lần chạy: Q, V2, thuốc, AUC, MIC, các điểm đo. Cần chạy SQL F2 trên Supabase; chưa chạy thì app vẫn lưu được và có nhắc.\n- Vancomycin: xóa lịch sử đúng 1 dòng đã chọn, kể cả khi lưu 2 lần cùng ngày. Lịch sử có thêm giờ lưu.\n- Chống lưu nhầm bệnh nhân: app không cho lưu nếu kết quả được tính cho bệnh nhân khác, hoặc dữ liệu đã đổi sau khi tính.\n- Thay đổi giống bản máy tính 31/10/2026. Bản iPhone cập nhật cùng lúc.",
  "required": false,
- "date": "2026-10-30"
+ "date": "2026-10-31"
 }
