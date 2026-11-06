@@ -1,10 +1,10 @@
 {
- "versionCode": 24,
- "versionName": "0.18.0",
- "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.18.0/tdm-amg-0.18.0.apk",
- "sha256": "70dfbc08ef58944fb1127d7ef02954e7980ece4e515a25560da71d866ee95491",
- "size": 49682845,
- "notes": "TDM AMG 0.18.0\n\n- Sawchuk–Zaske: chỉ còn 1 nút «💾 Lưu TDM lên Cloud» ở bước Hiệu chỉnh liều. Nút này lưu chung kết quả cá thể hóa và phác đồ vừa tính. Chưa tính phác đồ vẫn lưu được (app hỏi lại).\n- Khi tải bệnh nhân, app hiện dòng «📌 Lần TDM trước đã chọn: … mg q…h» và điền sẵn bước Hiệu chỉnh liều. Nút «➕ Thêm các liều theo phác đồ này» thêm liều; người dùng tự nhập giờ truyền thực tế của liều đầu.\n- Bayesian mô hình 2 ngăn (Carrié, Jin, Smit…): hiện V1 · V2 · β thay cho Vd · Ke. Lịch sử có thêm giờ lưu và tên thuốc.\n- Lưu thêm chi tiết mỗi lần chạy: Q, V2, thuốc, AUC, MIC, các điểm đo. Cần chạy SQL F2 trên Supabase; chưa chạy thì app vẫn lưu được và có nhắc.\n- Vancomycin: xóa lịch sử đúng 1 dòng đã chọn, kể cả khi lưu 2 lần cùng ngày. Lịch sử có thêm giờ lưu.\n- Chống lưu nhầm bệnh nhân: app không cho lưu nếu kết quả được tính cho bệnh nhân khác, hoặc dữ liệu đã đổi sau khi tính.\n- Thay đổi giống bản máy tính 31/10/2026. Bản iPhone cập nhật cùng lúc.",
+ "versionCode": 25,
+ "versionName": "0.19.0",
+ "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.19.0/tdm-amg-0.19.0.apk",
+ "sha256": "6283642c700df1230bec56d9ee3ebb27ed57c0b0ced1da5d5862dd9791420073",
+ "size": 49684613,
+ "notes": "TDM AMG 0.19.0\n\n- Vancomycin: thêm mô hình Yamamoto 2009 (đúng bài gốc), giống bản máy tính 06/11/2026. Có ô «Loại nhiễm khuẩn»: Chung (mặc định), Nhiễm khuẩn huyết, Viêm phổi, Khác. CLcr theo cân nặng thực, không sàn SCr.\n- Bố cục mới giống Mục 4 bản máy tính: bước 1 chỉ còn thông tin bệnh nhân. Bước 5 «Mô hình & kết quả Bayes» có ô chọn mô hình, các tuỳ chọn của mô hình, chú thích dân số và thận trọng, cảnh báo BMI, rồi nút «🧮 Chạy tối ưu Bayes». Bấm nút mới chạy (không tự chạy khi mở bước).\n- Nút «💾 Lưu kết quả lên Cloud» nằm ngay dưới đồ thị ở bước 5. Bước cuối chỉ còn xem / xóa lịch sử.\n- Đổi mô hình hoặc tuỳ chọn mô hình thì kết quả cũ được xoá, phải chạy lại.\n- Chặn chạy khi có lần đo SCr trống hoặc bằng 0 (mọi mô hình).\n- Yamamoto: cảnh báo khi tham số lệch xa tiền nghiệm (thường do sai giờ lấy mẫu hoặc sai nồng độ).\n- Lưu thêm τ của từng liều: tải lại bệnh nhân giữ đúng τ đã nhập (trước đây liều cuối luôn về 12 giờ).\n- Tải bệnh nhân lưu bằng mô hình app chưa hỗ trợ: app báo rõ thay vì âm thầm tính bằng Goti.\n- Bản iPhone cập nhật cùng lúc.",
  "required": false,
- "date": "2026-10-31"
+ "date": "2026-11-06"
 }
