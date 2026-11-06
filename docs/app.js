@@ -359,7 +359,8 @@ function showHome() {
     py('v_load', { msyt: vmsyt }, (r) => {
       if (r.ok) {
         App.vs = new VancoState(); App.vs.applyForm(r.form || {}); App.vs.history = r.history || null;
-        toast(r.message || ''); App.module = 'vanco'; startWizard();
+        App.module = 'vanco'; startWizard();
+        if (r.level === 'warn') alert(r.message || ''); else toast(r.message || '');   // v0.19.0: mô hình đã lưu chưa hỗ trợ
       } else ui.setStatus(vstatus, r.message, r.level || 'error');
     });
   }));
@@ -535,7 +536,7 @@ class VancoState {
   constructor() {
     this.msyt = ''; this.gender = 'nam'; this.age = '50'; this.height = '165'; this.weight = '60';
     this.method = 'Goti 2018'; this.dialysis = false; this.malignancy = false; this.heelprick = false; this.gpos = true;
-    this.hf = false;
+    this.hf = false; this.infection = 'Chung'; this.lastMsg = '';   // v0.19.0: Yamamoto 2009
     this.scr = [ScrRow()]; this.doses = []; this.meas = [];
     this.newDose = '1000'; this.newTau = '12'; this.newTinf = '1'; this.target = '';
     this.result = null; this.newRes = null; this.history = null; this.selected = new Set();
@@ -546,7 +547,7 @@ class VancoState {
   json() {
     return { msyt: this.msyt, gender: this.gender, age: this.age, height: this.height, weight: this.weight, method: this.method,
       dialysis: this.dialysis, malignancy: this.malignancy, heelprick: this.heelprick, gpos: this.gpos, hf: this.hf,
-      new_dose: this.newDose, new_tau: this.newTau, scr: this.scr.map((r) => r.toJson()),
+      infection: this.infection, new_dose: this.newDose, new_tau: this.newTau, scr: this.scr.map((r) => r.toJson()),
       doses: this.doses.map((r) => r.toJson()), measurements: this.meas.map((r) => r.toJson()) };
   }
   applyForm(f) {
@@ -555,6 +556,7 @@ class VancoState {
     if ('weight' in f) this.weight = optStr(f, 'weight');
     this.method = f.method || this.method; this.dialysis = !!f.dialysis; this.malignancy = !!f.malignancy;
     this.heelprick = !!f.heelprick; this.gpos = f.gpos === undefined ? true : !!f.gpos; this.hf = !!f.hf;
+    this.infection = f.infection || 'Chung';
     this.scr = (f.scr || []).map((o) => ScrRow(optStr(o, 'scr'), o.unit || 'μmol/L', o.measured_at || '', o.ure == null ? '' : optStr(o, 'ure')));
     this.doses = (f.doses || []).map((o) => VDoseRow(o.given_at || '', optStr(o, 'dose_mg'), optStr(o, 'tau_h', '12'), optStr(o, 't_inf_h', '1')));
     this.meas = (f.measurements || []).map((o) => VMeasRow(optStr(o, 'c_obs'), o.t_obs || '', !!o.group_next));
@@ -1097,13 +1099,13 @@ const BayesSteps = {
 // ================================================================== Tab 4 Vancomycin (VancoSteps.kt)
 const VancoSteps = {
   steps() {
-    return [{ title: 'Bệnh nhân & mô hình', build: this.buildPatient.bind(this) },
+    return [{ title: 'Bệnh nhân', build: this.buildPatient.bind(this) },
       { title: 'Các lần đo SCr', build: this.buildScr.bind(this) },
       { title: 'Liều đã dùng', build: this.buildDoses.bind(this) },
       { title: 'Nồng độ đo được', build: this.buildMeas.bind(this) },
-      { title: 'Kết quả Bayes', build: this.buildResult.bind(this) },
+      { title: 'Mô hình & kết quả Bayes', build: this.buildResult.bind(this) },
       { title: 'Liều mới & dự đoán', build: this.buildNewDose.bind(this) },
-      { title: 'Lưu & lịch sử', build: this.buildSave.bind(this) }];
+      { title: 'Lịch sử', build: this.buildSave.bind(this) }];
   },
   changed() { App.vs.result = null; App.vs.newRes = null; },
   methods() { return Array.isArray(App.vmeta.methods) ? App.vmeta.methods : ['Goti 2018', 'Collin 2019']; },
@@ -1115,29 +1117,10 @@ const VancoSteps = {
     ui.choice(ui.cell(r1), 'Giới tính', ['nam', 'nữ'], vs.gender, (_, v) => { vs.gender = v; this.changed(); });
     ui.field(ui.cell(r1), 'Tuổi', vs.age, (v) => { vs.age = v; this.changed(); });
     const r2 = ui.row(c);
-    // v0.16.0: goi y Komatsu 2025 khi BMI >= 25 (cap nhat ngay khi go, khong tu doi mo hinh)
-    let hintTv = null, hintBtn = null;
-    const refreshHint = () => {
-      if (!hintTv) return;
-      const [txt, btn] = this.bmiHint();
-      hintTv.textContent = txt; hintTv.style.display = txt ? '' : 'none';
-      hintBtn.style.display = btn ? '' : 'none';
-    };
-    ui.field(ui.cell(r2), 'Chiều cao (cm)', vs.height, (v) => { vs.height = v; this.changed(); refreshHint(); });
-    ui.field(ui.cell(r2), 'Cân nặng (kg)', vs.weight, (v) => { vs.weight = v; this.changed(); refreshHint(); });
-    hintTv = ui.text(c, '', 13, '#9A6700', false, 6);
-    hintBtn = ui.smallButton(c, 'Dùng Komatsu 2025', '#8250DF', () => { vs.method = KOMATSU; this.changed(); redraw(); });
-    refreshHint();
-    const c2 = ui.card(p);
-    ui.choice(c2, '⚙️ Phương pháp tính Bayes', this.methods(), vs.method, (_, v) => { vs.method = v; this.changed(); redraw(); });
-    ui.text(c2, (App.vmeta.population || {})[vs.method] || '', 13, Col.muted, false, 8);
-    const fl = ((App.vmeta.flags || {})[vs.method]) || [];
-    if (fl.length) ui.divider(c2);
-    if (fl.includes('dialysis')) ui.check(c2, 'Đang lọc máu (Hemodialysis)', vs.dialysis, (b) => { vs.dialysis = b; this.changed(); });
-    if (fl.includes('malignancy')) ui.check(c2, 'Bệnh máu ác tính (STDY10)', vs.malignancy, (b) => { vs.malignancy = b; this.changed(); });
-    if (fl.includes('heelprick')) ui.check(c2, 'Mẫu lấy gót chân - Heel-prick (STDY13)', vs.heelprick, (b) => { vs.heelprick = b; this.changed(); });
-    if (fl.includes('gpos')) ui.check(c2, 'Nhiễm khuẩn Gram dương (dis_gpos — Yamamoto)', vs.gpos, (b) => { vs.gpos = b; this.changed(); });
-    if (fl.includes('hf')) ui.check(c2, 'Suy tim (Komatsu 2025)', vs.hf, (b) => { vs.hf = b; this.changed(); });
+    ui.field(ui.cell(r2), 'Chiều cao (cm)', vs.height, (v) => { vs.height = v; this.changed(); });
+    ui.field(ui.cell(r2), 'Cân nặng (kg)', vs.weight, (v) => { vs.weight = v; this.changed(); });
+    // v0.19.0 (giống Tab 4 v06.11.26b): chọn mô hình, tuỳ chọn, chú thích, cảnh báo BMI ở bước «Mô hình & kết quả Bayes»
+    ui.hint(c, 'Mô hình tiền nghiệm chọn ở bước «Mô hình & kết quả Bayes» (ngay trên nút Chạy tối ưu Bayes).');
   },
   // (thong bao, co hien nut "Dung Komatsu") -- giong _update_bmi_hint() cua Tab 4 v26.10.26b
   bmiHint() {
@@ -1212,41 +1195,85 @@ const VancoSteps = {
     });
     ui.button(p, '➕ Thêm điểm đo', Col.blue, 12, () => { vs.meas.push(VMeasRow()); this.changed(); redraw(); scrollToBottom(); });
   },
+  // v0.19.0 (bố cục M1, giống Mục 4 Tab 4 v06.11.26c): chọn mô hình → tuỳ chọn → chú thích → cảnh báo BMI → nút chạy
+  //          → tiền nghiệm / hậu nghiệm / AUC / đồ thị → nút lưu nhỏ. Không tự chạy khi mở bước.
   buildResult(p) {
     const vs = App.vs;
-    const status = ui.status(p);
+    const c = ui.card(p);
+    ui.choice(c, '⚙️ Lựa chọn mô hình tiền nghiệm', this.methods(), vs.method, (_, v) => {
+      vs.method = v; this.changed(); vs.lastMsg = 'ℹ️ Đã đổi mô hình tiền nghiệm — bấm «Chạy tối ưu Bayes» để tính lại.'; redraw();
+    });
+    const fl = ((App.vmeta.flags || {})[vs.method]) || [];
+    const ch = () => { this.changed(); vs.lastMsg = 'ℹ️ Đã đổi tuỳ chọn mô hình — bấm «Chạy tối ưu Bayes» để tính lại.'; redraw(); };
+    const opt = add(c, ui.vbox()); opt.style.paddingLeft = '16px';
+    if (fl.includes('dialysis')) ui.check(opt, 'Đang lọc máu (Hemodialysis)', vs.dialysis, (b) => { vs.dialysis = b; ch(); });
+    if (fl.includes('malignancy')) ui.check(opt, 'Bệnh máu ác tính (STDY10)', vs.malignancy, (b) => { vs.malignancy = b; ch(); });
+    if (fl.includes('heelprick')) ui.check(opt, 'Mẫu lấy gót chân - Heel-prick (STDY13)', vs.heelprick, (b) => { vs.heelprick = b; ch(); });
+    if (fl.includes('gpos')) ui.check(opt, 'Nhiễm khuẩn Gram dương (dis_gpos — Yamamoto)', vs.gpos, (b) => { vs.gpos = b; ch(); });
+    if (fl.includes('hf')) {
+      ui.check(opt, 'Suy tim (Komatsu 2025)', vs.hf, (b) => { vs.hf = b; ch(); });
+      ui.text(opt, App.vmeta.ure_hint || '', 12, Col.muted, false, 0);
+    }
+    if (fl.includes('infection')) {
+      const inf = Array.isArray(App.vmeta.infections) ? App.vmeta.infections : ['Chung', 'Nhiễm khuẩn huyết', 'Viêm phổi', 'Khác'];
+      ui.choice(opt, 'Loại nhiễm khuẩn (Yamamoto 2009)', inf, vs.infection, (_, v) => { vs.infection = v; ch(); });
+    }
+    ui.text(c, (App.vmeta.population || {})[vs.method] || '', 13, Col.muted, false, 8).style.whiteSpace = 'pre-line';
+    const [hTxt, hBtn] = this.bmiHint();
+    if (hTxt) {
+      ui.text(c, hTxt, 13, '#9A6700', false, 6);
+      if (hBtn) ui.smallButton(c, 'Dùng Komatsu 2025', '#8250DF', () => { vs.method = KOMATSU; this.changed(); redraw(); });
+    }
+    const btnHolder = add(c, ui.vbox());
+    const status = ui.status(c);
     const box = add(p, ui.vbox());
-    ui.setStatus(status, 'Đang chạy tối ưu Bayes…');
-    py('v_solve', vs.json(), (r) => {
-      vs.result = r.ok ? r : null;
-      vs.proj = null;
-      ui.setStatus(status, r.message, r.level);
-      if (r.priors) {
-        const pr = r.priors;
-        const c = ui.fold(ui.card(box), 'Tham số tiền nghiệm — ' + vs.method);
-        ui.metrics(c, [['CrCl (mL/phút)', String(pr.crcl ?? '')], ['CLprior (L/h)', String(pr.cl ?? '')], ['Vc,prior (L)', String(pr.vc ?? '')], ['Vp,prior (L)', String(pr.vp ?? '')]]);
-        ui.text(c, pr.info || '', 12, Col.muted, false, 8);
-      }
-      if (!r.ok) return;
-      const k = r.cards;
-      const c = ui.fold(ui.card(box), 'Kết quả hậu nghiệm');
-      ui.metrics(c, [['CL_optimized (L/h)', k.cl], ['Vc_optimized (L)', k.vc], ['Vp_optimized (L)', k.vp], ['C_pred_final (μg/mL)', k.cpred],
-        ['OFV_final', k.ofv], ['k10 (h⁻¹)', k.k10], ['k12 (h⁻¹)', k.k12], ['k21 (h⁻¹)', k.k21], ['α (h⁻¹)', k.alpha], ['β (h⁻¹)', k.beta]].map(([a, b]) => [a, String(b ?? '')]));
-      const c2 = ui.card(box);
-      ui.header(c2, 'AUC24h');
-      ui.metrics(c2, [['AUC24h ngày TDM (mg·h/L)', String(r.auc_day ?? '')], ['AUC24h khi cân bằng (mg·h/L)', String(r.auc_current ?? '')]]);
-      ui.text(c2, r.auc_day_info || '', 12, Col.muted, false, 6);
-      if (r.chart) {
-        const cc = ui.card(box);
-        ui.header(cc, 'Đường cong nồng độ mô phỏng');
-        ui.hint(cc, 'Đường tím: C(t) hậu nghiệm; chấm đỏ: Cobs của lần TDM cuối.');
-        drawChart(cc, r.chart, Col.purple);
-      }
+    const run = ui.button(btnHolder, '🧮 Chạy tối ưu Bayes', Col.purple, 10, () => {
+      ui.setStatus(status, 'Đang chạy tối ưu Bayes…'); box.innerHTML = '';
+      py('v_solve', vs.json(), (r) => {
+        vs.result = r.ok ? r : null; vs.proj = null; vs.lastMsg = '';
+        this.renderResult(box, status, r);
+      });
+    });
+    run.style.width = 'auto'; run.style.padding = '8px 16px';
+    if (vs.result) this.renderResult(box, status, vs.result);
+    else ui.setStatus(status, vs.lastMsg || 'Bấm «Chạy tối ưu Bayes» để tính.', 'info');
+  },
+  renderResult(box, status, r) {
+    const vs = App.vs;
+    box.innerHTML = '';
+    ui.setStatus(status, r.message, r.level);
+    if (r.priors) {
+      const pr = r.priors;
+      const c = ui.fold(ui.card(box), 'Tham số tiền nghiệm — ' + vs.method);
+      ui.metrics(c, [['CrCl (mL/phút)', String(pr.crcl ?? '')], ['CLprior (L/h)', String(pr.cl ?? '')], ['Vc,prior (L)', String(pr.vc ?? '')], ['Vp,prior (L)', String(pr.vp ?? '')]]);
+      ui.text(c, pr.info || '', 12, Col.muted, false, 8);
+      if (pr.warn) ui.text(box, pr.warn, 13, '#9A6700', false, 6);
+    }
+    if (!r.ok) return;
+    const k = r.cards;
+    const c = ui.fold(ui.card(box), 'Kết quả hậu nghiệm');
+    ui.metrics(c, [['CL_optimized (L/h)', k.cl], ['Vc_optimized (L)', k.vc], ['Vp_optimized (L)', k.vp], ['C_pred_final (μg/mL)', k.cpred],
+      ['OFV_final', k.ofv], ['k10 (h⁻¹)', k.k10], ['k12 (h⁻¹)', k.k12], ['k21 (h⁻¹)', k.k21], ['α (h⁻¹)', k.alpha], ['β (h⁻¹)', k.beta]].map(([a, b]) => [a, String(b ?? '')]));
+    const c2 = ui.card(box);
+    ui.header(c2, 'AUC24h');
+    ui.metrics(c2, [['AUC24h ngày TDM (mg·h/L)', String(r.auc_day ?? '')], ['AUC24h khi cân bằng (mg·h/L)', String(r.auc_current ?? '')]]);
+    ui.text(c2, r.auc_day_info || '', 12, Col.muted, false, 6);
+    if (r.chart) {
+      const cc = ui.card(box);
+      ui.header(cc, 'Đường cong nồng độ mô phỏng');
+      ui.hint(cc, 'Đường tím: C(t) hậu nghiệm; chấm đỏ: Cobs của lần TDM cuối.');
+      drawChart(cc, r.chart, Col.purple);
+    }
+    // v0.19.0: nút lưu nhỏ ngay trong bước kết quả (trước đây ở bước cuối «Lưu & lịch sử»)
+    const sc = ui.card(box);
+    const sv = ui.status(sc);
+    ui.smallButton(sc, '💾 Lưu kết quả lên Cloud', Col.greenBtn, () => {
+      py('v_save', vs.json(), (s) => { ui.setStatus(sv, s.message, s.level); if (s.ok) vs.history = null; });
     });
   },
   buildNewDose(p) {
     const vs = App.vs;
-    if (!vs.result) { ui.text(p, '⚠️ Chưa có kết quả Bayes hợp lệ — quay lại bước «Kết quả Bayes».', 15, Col.amber, false, 12); return; }
+    if (!vs.result) { ui.text(p, '⚠️ Chưa có kết quả Bayes hợp lệ — quay lại bước «Mô hình & kết quả Bayes».', 15, Col.amber, false, 12); return; }
     vs.extraRegs = vs.extraRegs || [];
     // ---- phac do so sanh (v0.13.0)
     const c = ui.card(p);
@@ -1339,11 +1366,9 @@ const VancoSteps = {
   hist: null, delStatus: null,
   buildSave(p) {
     const vs = App.vs;
-    const sv = ui.status(p);
-    ui.button(p, '💾 Lưu kết quả TDM Vancomycin lên Cloud', Col.greenBtn, 8, () => {
-      py('v_save', vs.json(), (r) => { ui.setStatus(sv, r.message, r.level); if (r.ok) this.loadHistory(); });
-    });
-    const hc = ui.card(p, 16);
+    // v0.19.0: nút lưu chuyển lên bước «Mô hình & kết quả Bayes»; bước này chỉ xem / xóa lịch sử
+    ui.hint(p, 'Lưu kết quả ở bước «Mô hình & kết quả Bayes» (nút 💾 dưới đồ thị).');
+    const hc = ui.card(p, 8);
     ui.header(hc, `📋 Lịch sử kết quả TDM (MSYT ${vs.msyt || '—'})`);
     this.hist = add(hc, ui.vbox());
     this.renderHistory();
