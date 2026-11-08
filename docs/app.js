@@ -528,7 +528,8 @@ class Tab1State {
 }
 
 const VDoseRow = (at = nowHourIso(), dose = '1000', tau = '12', tinf = '1') => ({ at, dose, tau, tinf, toJson() { return { given_at: this.at, dose_mg: this.dose, tau_h: this.tau, t_inf_h: this.tinf }; } });
-const VMeasRow = (cobs = '15', at = nowHourIso(), groupNext = false) => ({ cobs, at, groupNext, toJson() { return { c_obs: this.cobs, t_obs: this.at, group_next: this.groupNext }; } });
+// v0.20.0: «Chọn gộp» (selected) thay «Gộp với liều kế tiếp» — giống Tab 4 v08.11.26
+const VMeasRow = (cobs = '15', at = nowHourIso(), selected = false) => ({ cobs, at, selected, toJson() { return { c_obs: this.cobs, t_obs: this.at, selected: this.selected }; } });
 
 const KOMATSU = 'Komatsu 2025 (BMI ≥ 25)';   // v0.16.0
 
@@ -559,7 +560,7 @@ class VancoState {
     this.infection = f.infection || 'Chung';
     this.scr = (f.scr || []).map((o) => ScrRow(optStr(o, 'scr'), o.unit || 'μmol/L', o.measured_at || '', o.ure == null ? '' : optStr(o, 'ure')));
     this.doses = (f.doses || []).map((o) => VDoseRow(o.given_at || '', optStr(o, 'dose_mg'), optStr(o, 'tau_h', '12'), optStr(o, 't_inf_h', '1')));
-    this.meas = (f.measurements || []).map((o) => VMeasRow(optStr(o, 'c_obs'), o.t_obs || '', !!o.group_next));
+    this.meas = (f.measurements || []).map((o) => VMeasRow(optStr(o, 'c_obs'), o.t_obs || '', !!o.selected));
     if (!this.scr.length) this.scr.push(ScrRow()); if (!this.doses.length) this.doses.push(VDoseRow()); if (!this.meas.length) this.meas.push(VMeasRow());
     this.result = null; this.newRes = null; this.selected = new Set();
   }
@@ -1184,14 +1185,20 @@ const VancoSteps = {
   },
   buildMeas(p) {
     const vs = App.vs;
-    ui.hint(p, 'Có thể nhập nhiều lần đo (nhiều lần TDM khác khoảng đưa liều, hoặc peak + trough cùng khoảng đưa liều). Thời gian truyền nhập ở bước «Liều đã dùng». Mẫu ĐÁY lấy ngay trước liều N+1 muốn tính chung một lần TDM với mẫu ĐỈNH sau liều N+1: đánh dấu «Gộp với liều kế tiếp» ở mẫu đáy (Goti/Collin chạy chung 1 OFV).');
+    const hintEl = ui.hint(p, 'Có thể nhập nhiều lần đo. Thời gian truyền nhập ở bước «Liều đã dùng».\n' +
+      '«Chọn gộp»: tích các nồng độ muốn chạy Bayes 1 lần.\n' +
+      '• Không chọn / chọn 1 điểm / các điểm chọn cùng khoảng liều hoặc ở 2 khoảng liều kế cận (vd. đáy N + đỉnh N+1): Bayes tuần tự như cũ, dùng mọi điểm đo.\n' +
+      '• Các điểm chọn thuộc ≥ 2 lần TDM: Bayes GỘP — V dùng chung, CL riêng từng lần TDM, CHỈ dùng các điểm đã chọn (điểm không chọn bị bỏ qua). Cảnh báo khi 2 lần TDM cách nhau > 14 ngày.');
+    hintEl.style.whiteSpace = 'pre-line';
+    const unused = new Set((vs.result && vs.result.unused_idx) || []);
     vs.meas.forEach((m, i) => {
       const c = ui.card(p, 10);
       const head = headRow(c, `Điểm đo ${i + 1}`);
       ui.smallButton(head, '🗑', Col.red, () => { vs.meas.splice(i, 1); this.changed(); redraw(); });
       ui.field(c, 'Cobs (μg/mL)', m.cobs, (v) => { m.cobs = v; this.changed(); });
       ui.dateTime(c, 'Tobs (thời điểm lấy mẫu)', m.at, (v) => { m.at = v; this.changed(); });
-      ui.check(c, 'Gộp với liều kế tiếp (đáy trước liều N+1 + đỉnh sau liều N+1 = 1 lần TDM)', m.groupNext, (b) => { m.groupNext = b; this.changed(); });
+      ui.check(c, 'Chọn gộp (chạy Bayes chung với các điểm đã chọn)', m.selected, (b) => { m.selected = b; this.changed(); });
+      if (unused.has(i)) ui.text(c, '(không dùng — không được chọn)', 12, Col.muted, false, 2);
     });
     ui.button(p, '➕ Thêm điểm đo', Col.blue, 12, () => { vs.meas.push(VMeasRow()); this.changed(); redraw(); scrollToBottom(); });
   },
@@ -1261,7 +1268,9 @@ const VancoSteps = {
     if (r.chart) {
       const cc = ui.card(box);
       ui.header(cc, 'Đường cong nồng độ mô phỏng');
-      ui.hint(cc, 'Đường tím: C(t) hậu nghiệm; chấm đỏ: Cobs của lần TDM cuối.');
+      ui.hint(cc, r.bayes_mode === 'gop_V_chung'
+        ? 'Bayes gộp: đường tím theo CL từng lần TDM (V chung); chấm đỏ: Cobs đã chọn; vòng xám: Cobs không chọn (không dùng).'
+        : 'Đường tím: C(t) hậu nghiệm; chấm đỏ: Cobs của lần TDM cuối.');
       drawChart(cc, r.chart, Col.purple);
     }
     // v0.19.0: nút lưu nhỏ ngay trong bước kết quả (trước đây ở bước cuối «Lưu & lịch sử»)

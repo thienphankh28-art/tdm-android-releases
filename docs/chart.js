@@ -22,9 +22,11 @@ function drawChart(parent, chart, color) {
     c.setTransform(dpr, 0, 0, dpr, 0, 0);
     c.clearRect(0, 0, W, H);
     const xs = chart.x || [], ys = chart.y || [], px = chart.px || [], pyv = chart.py || [];
+    const ux = chart.ux || [], uy = chart.uy || [];      // v0.20.0: Cobs không dùng (vòng xám)
     if (!xs.length) return;
     let xmin = Math.min(...xs), xmax = Math.max(...xs);
     if (px.length) { xmin = Math.min(xmin, ...px); xmax = Math.max(xmax, ...px); }
+    if (ux.length) { xmin = Math.min(xmin, ...ux); xmax = Math.max(xmax, ...ux); }
     const zoomable = xmax - xmin > 72;
     cv.style.cursor = zoomable ? 'pointer' : '';
     const left = 40, right = W - 10, top = zoomable ? 26 : 12, bottom = H - 34;
@@ -32,6 +34,7 @@ function drawChart(parent, chart, color) {
     let ymax = 0;
     xs.forEach((x, i) => { if (x >= xmin) ymax = Math.max(ymax, ys[i]); });
     px.forEach((x, i) => { if (x >= xmin) ymax = Math.max(ymax, pyv[i]); });
+    ux.forEach((x, i) => { if (x >= xmin) ymax = Math.max(ymax, uy[i]); });
     (chart.hlines || []).forEach((h) => { ymax = Math.max(ymax, h.y); });
     ymax *= 1.08; if (ymax <= 0) ymax = 1;
     if (xmax <= xmin) xmax = xmin + 1;
@@ -92,6 +95,8 @@ function drawChart(parent, chart, color) {
     c.stroke();
     c.fillStyle = Col.red;
     px.forEach((x, i) => { if (x >= xmin) { c.beginPath(); c.arc(sx(x), sy(pyv[i]), 4.5, 0, Math.PI * 2); c.fill(); } });
+    c.strokeStyle = 'gray'; c.lineWidth = 1.6;
+    ux.forEach((x, i) => { if (x >= xmin) { c.beginPath(); c.arc(sx(x), sy(uy[i]), 4.5, 0, Math.PI * 2); c.stroke(); } });
     c.restore();
   };
   cv.addEventListener('click', () => { lastDays = !lastDays; render(); });
