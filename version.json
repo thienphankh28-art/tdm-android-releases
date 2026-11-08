@@ -1,10 +1,10 @@
 {
- "versionCode": 25,
- "versionName": "0.19.0",
- "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.19.0/tdm-amg-0.19.0.apk",
- "sha256": "6283642c700df1230bec56d9ee3ebb27ed57c0b0ced1da5d5862dd9791420073",
- "size": 49684613,
- "notes": "TDM AMG 0.19.0\n\n- Vancomycin: thêm mô hình Yamamoto 2009 (đúng bài gốc), giống bản máy tính 06/11/2026. Có ô «Loại nhiễm khuẩn»: Chung (mặc định), Nhiễm khuẩn huyết, Viêm phổi, Khác. CLcr theo cân nặng thực, không sàn SCr.\n- Bố cục mới giống Mục 4 bản máy tính: bước 1 chỉ còn thông tin bệnh nhân. Bước 5 «Mô hình & kết quả Bayes» có ô chọn mô hình, các tuỳ chọn của mô hình, chú thích dân số và thận trọng, cảnh báo BMI, rồi nút «🧮 Chạy tối ưu Bayes». Bấm nút mới chạy (không tự chạy khi mở bước).\n- Nút «💾 Lưu kết quả lên Cloud» nằm ngay dưới đồ thị ở bước 5. Bước cuối chỉ còn xem / xóa lịch sử.\n- Đổi mô hình hoặc tuỳ chọn mô hình thì kết quả cũ được xoá, phải chạy lại.\n- Chặn chạy khi có lần đo SCr trống hoặc bằng 0 (mọi mô hình).\n- Yamamoto: cảnh báo khi tham số lệch xa tiền nghiệm (thường do sai giờ lấy mẫu hoặc sai nồng độ).\n- Lưu thêm τ của từng liều: tải lại bệnh nhân giữ đúng τ đã nhập (trước đây liều cuối luôn về 12 giờ).\n- Tải bệnh nhân lưu bằng mô hình app chưa hỗ trợ: app báo rõ thay vì âm thầm tính bằng Goti.\n- Bản iPhone cập nhật cùng lúc.",
+ "versionCode": 26,
+ "versionName": "0.20.0",
+ "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.20.0/tdm-amg-0.20.0.apk",
+ "sha256": "325c5c2390cb4a0507303355e864bb1f970f99fc7aed31a944ac8eeb7b543bda",
+ "size": 49698641,
+ "notes": "TDM AMG 0.20.0\n\n- Vancomycin: thay ô «Gộp với liều kế tiếp» bằng ô «Chọn gộp» ở mỗi nồng độ, giống bản máy tính 08/11/2026.\n- Không chọn, chọn 1 điểm, hoặc các điểm chọn cùng khoảng liều / 2 khoảng liều kế cận (vd. đáy N + đỉnh N+1): Bayes tuần tự như cũ, dùng mọi điểm đo. Kết quả không đổi so với bản 0.19.0.\n- Các điểm chọn thuộc từ 2 lần TDM trở lên: Bayes GỘP — V dùng chung, CL riêng từng lần TDM, chỉ dùng các điểm đã chọn; điểm không chọn ghi «(không dùng — không được chọn)» và hiện vòng xám trên đồ thị.\n- Áp dụng cho Goti 2018, Collin 2019, Komatsu 2025, Yamamoto 2009. Các mô hình tucuxi.* không đổi.\n- Cảnh báo khi 2 lần TDM cách nhau hơn 14 ngày, khi mẫu mới nhất không được chọn, ghi chú khi chỉ chọn 1 điểm.\n- Hồ sơ cũ có «Gộp với liều kế tiếp» mở lại tự chọn mẫu đó + mẫu ngay sau, kết quả giữ nguyên. Hồ sơ lưu mới vẫn mở đúng trên bản cũ.\n- Bản iPhone cập nhật cùng lúc.",
  "required": false,
- "date": "2026-11-06"
+ "date": "2026-11-08"
 }
