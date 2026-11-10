@@ -1,10 +1,10 @@
 {
- "versionCode": 26,
- "versionName": "0.20.0",
- "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.20.0/tdm-amg-0.20.0.apk",
- "sha256": "325c5c2390cb4a0507303355e864bb1f970f99fc7aed31a944ac8eeb7b543bda",
- "size": 49698641,
- "notes": "TDM AMG 0.20.0\n\n- Vancomycin: thay ô «Gộp với liều kế tiếp» bằng ô «Chọn gộp» ở mỗi nồng độ, giống bản máy tính 08/11/2026.\n- Không chọn, chọn 1 điểm, hoặc các điểm chọn cùng khoảng liều / 2 khoảng liều kế cận (vd. đáy N + đỉnh N+1): Bayes tuần tự như cũ, dùng mọi điểm đo. Kết quả không đổi so với bản 0.19.0.\n- Các điểm chọn thuộc từ 2 lần TDM trở lên: Bayes GỘP — V dùng chung, CL riêng từng lần TDM, chỉ dùng các điểm đã chọn; điểm không chọn ghi «(không dùng — không được chọn)» và hiện vòng xám trên đồ thị.\n- Áp dụng cho Goti 2018, Collin 2019, Komatsu 2025, Yamamoto 2009. Các mô hình tucuxi.* không đổi.\n- Cảnh báo khi 2 lần TDM cách nhau hơn 14 ngày, khi mẫu mới nhất không được chọn, ghi chú khi chỉ chọn 1 điểm.\n- Hồ sơ cũ có «Gộp với liều kế tiếp» mở lại tự chọn mẫu đó + mẫu ngay sau, kết quả giữ nguyên. Hồ sơ lưu mới vẫn mở đúng trên bản cũ.\n- Bản iPhone cập nhật cùng lúc.",
+ "versionCode": 27,
+ "versionName": "0.21.0",
+ "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.21.0/tdm-amg-0.21.0.apk",
+ "sha256": "f99ae793a7925a702c6cd251b59832726413da90a3845a890736bdf04e77c515",
+ "size": 49698361,
+ "notes": "TDM AMG 0.21.0\n\n- Vancomycin: 4 mô hình tucuxi.* (goti, collin, thomson, yamamoto) chỉ hiện với tài khoản admin, giống bản máy tính 10/11/2026.\n- Tài khoản thường mở hồ sơ đã lưu bằng mô hình tucuxi.*: vẫn tải đủ thông tin bệnh nhân, liều, nồng độ; mô hình tự chuyển sang Goti 2018 kèm thông báo, bấm «Chạy tối ưu Bayes» để tính lại.\n- Bản iPhone cập nhật cùng lúc.",
  "required": false,
- "date": "2026-11-08"
+ "date": "2026-11-10"
 }
