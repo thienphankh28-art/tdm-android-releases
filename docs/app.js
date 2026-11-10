@@ -149,6 +149,8 @@ function loadKsEngine() {
   return ksEngineReady;
 }
 function goHome() { if (App.user) showHome(); else showLogin(); }
+// v0.21.0: vai trò admin (4 mô hình tucuxi.* chỉ hiện với admin — giống bản máy tính 10/11/2026)
+function isAdmin() { return !!App.user && (App.user.role || '').trim().toLowerCase() === 'admin'; }
 
 // ================================================================== khung man hinh
 const $ = (id) => document.getElementById(id);
@@ -359,8 +361,12 @@ function showHome() {
     py('v_load', { msyt: vmsyt }, (r) => {
       if (r.ok) {
         App.vs = new VancoState(); App.vs.applyForm(r.form || {}); App.vs.history = r.history || null;
+        // v0.21.0: người không phải admin mở hồ sơ lưu bằng tucuxi.* -> chuyển Goti 2018
+        const tucx = (!isAdmin() && String(App.vs.method || '').startsWith('tucuxi.')) ? App.vs.method : null;
+        if (tucx) App.vs.method = 'Goti 2018';
         App.module = 'vanco'; startWizard();
-        if (r.level === 'warn') alert(r.message || ''); else toast(r.message || '');   // v0.19.0: mô hình đã lưu chưa hỗ trợ
+        if (tucx) alert(`Hồ sơ được lưu bằng mô hình ${tucx} (chỉ tài khoản admin dùng được) — đã chuyển sang Goti 2018; bấm «Chạy tối ưu Bayes» để tính lại.`);
+        else if (r.level === 'warn') alert(r.message || ''); else toast(r.message || '');   // v0.19.0: mô hình đã lưu chưa hỗ trợ
       } else ui.setStatus(vstatus, r.message, r.level || 'error');
     });
   }));
@@ -1109,7 +1115,10 @@ const VancoSteps = {
       { title: 'Lịch sử', build: this.buildSave.bind(this) }];
   },
   changed() { App.vs.result = null; App.vs.newRes = null; },
-  methods() { return Array.isArray(App.vmeta.methods) ? App.vmeta.methods : ['Goti 2018', 'Collin 2019']; },
+  methods() {
+    const m = Array.isArray(App.vmeta.methods) ? App.vmeta.methods : ['Goti 2018', 'Collin 2019'];
+    return m.filter((x) => isAdmin() || !String(x).startsWith('tucuxi.'));     // v0.21.0: tucuxi.* chỉ admin
+  },
   buildPatient(p) {
     const vs = App.vs;
     const c = ui.card(p);
