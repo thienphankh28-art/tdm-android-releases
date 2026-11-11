@@ -1,10 +1,10 @@
 {
- "versionCode": 27,
- "versionName": "0.21.0",
- "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.21.0/tdm-amg-0.21.0.apk",
- "sha256": "f99ae793a7925a702c6cd251b59832726413da90a3845a890736bdf04e77c515",
- "size": 49698361,
- "notes": "TDM AMG 0.21.0\n\n- Vancomycin: 4 mô hình tucuxi.* (goti, collin, thomson, yamamoto) chỉ hiện với tài khoản admin, giống bản máy tính 10/11/2026.\n- Tài khoản thường mở hồ sơ đã lưu bằng mô hình tucuxi.*: vẫn tải đủ thông tin bệnh nhân, liều, nồng độ; mô hình tự chuyển sang Goti 2018 kèm thông báo, bấm «Chạy tối ưu Bayes» để tính lại.\n- Bản iPhone cập nhật cùng lúc.",
+ "versionCode": 28,
+ "versionName": "0.22.0",
+ "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.22.0/tdm-amg-0.22.0.apk",
+ "sha256": "e65d957b7acc781c8d8c41437978a7759758b02fa461593b7a532000dbc962b4",
+ "size": 49698793,
+ "notes": "TDM AMG 0.22.0\n\n- Vancomycin: thêm chế độ «Trẻ em» (ô tích ở bước Bệnh nhân), giống bản máy tính v11.11.26. Không tích = người lớn, kết quả không đổi.\n- Trẻ em: tuổi nhập năm + tháng (tháng có thể lẻ); chỉ dùng Collin 2019; nhập tuổi thai lúc sinh (20–45 tuần, mặc định 40), PMA tự tính; tiền nghiệm hiện PMA và SCr chuẩn theo tuổi.\n- Bayes trẻ em: giới hạn quanh tiền nghiệm ±5ω (bỏ giới hạn cứng của người lớn vốn ép sai trẻ < 8 kg), CL và Q2 theo V1/V2 cá thể như bài gốc; chạm giới hạn thì báo đỏ, không tính AUC/dự đoán, không lưu.\n- Liều mới: trẻ em mặc định 15 mg/kg mỗi 6 giờ, hiện mg/kg/ngày ở ô liều và bảng so sánh phác đồ.\n- Người lớn: ô «Mẫu lấy gót chân» (Collin) được ẩn và không dùng.\n- Lưu thêm cờ trẻ em và tuổi thai (cần đã chạy sql_tre_em_vanco.sql trên Supabase). Bản iPhone cập nhật cùng lúc.",
  "required": false,
- "date": "2026-11-10"
+ "date": "2026-11-11"
 }
