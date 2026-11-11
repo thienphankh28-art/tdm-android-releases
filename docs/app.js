@@ -544,6 +544,8 @@ class VancoState {
     this.msyt = ''; this.gender = 'nam'; this.age = '50'; this.height = '165'; this.weight = '60';
     this.method = 'Goti 2018'; this.dialysis = false; this.malignancy = false; this.heelprick = false; this.gpos = true;
     this.hf = false; this.infection = 'Chung'; this.lastMsg = '';   // v0.19.0: Yamamoto 2009
+    // v0.22.0: chế độ Trẻ em (giống Tab 4 v11.11.26)
+    this.child = false; this.ageY = '0'; this.ageM = '0'; this.ga = '40'; this.autoReg = null;
     this.scr = [ScrRow()]; this.doses = []; this.meas = [];
     this.newDose = '1000'; this.newTau = '12'; this.newTinf = '1'; this.target = '';
     this.result = null; this.newRes = null; this.history = null; this.selected = new Set();
@@ -555,6 +557,7 @@ class VancoState {
     return { msyt: this.msyt, gender: this.gender, age: this.age, height: this.height, weight: this.weight, method: this.method,
       dialysis: this.dialysis, malignancy: this.malignancy, heelprick: this.heelprick, gpos: this.gpos, hf: this.hf,
       infection: this.infection, new_dose: this.newDose, new_tau: this.newTau, scr: this.scr.map((r) => r.toJson()),
+      child: this.child, age_y: this.ageY, age_m: this.ageM, ga_weeks: this.ga,
       doses: this.doses.map((r) => r.toJson()), measurements: this.meas.map((r) => r.toJson()) };
   }
   applyForm(f) {
@@ -564,6 +567,9 @@ class VancoState {
     this.method = f.method || this.method; this.dialysis = !!f.dialysis; this.malignancy = !!f.malignancy;
     this.heelprick = !!f.heelprick; this.gpos = f.gpos === undefined ? true : !!f.gpos; this.hf = !!f.hf;
     this.infection = f.infection || 'Chung';
+    this.child = !!f.child;                                         // v0.22.0
+    if (this.child) { this.ageY = optStr(f, 'age_y', '0'); this.ageM = optStr(f, 'age_m', '0'); this.ga = optStr(f, 'ga_weeks', '40'); }
+    else this.heelprick = false;
     this.scr = (f.scr || []).map((o) => ScrRow(optStr(o, 'scr'), o.unit || 'μmol/L', o.measured_at || '', o.ure == null ? '' : optStr(o, 'ure')));
     this.doses = (f.doses || []).map((o) => VDoseRow(o.given_at || '', optStr(o, 'dose_mg'), optStr(o, 'tau_h', '12'), optStr(o, 't_inf_h', '1')));
     this.meas = (f.measurements || []).map((o) => VMeasRow(optStr(o, 'c_obs'), o.t_obs || '', !!o.selected));
@@ -1116,19 +1122,103 @@ const VancoSteps = {
   },
   changed() { App.vs.result = null; App.vs.newRes = null; },
   methods() {
+    if (App.vs.child) return this.childMethods();                    // v0.22.0: Trẻ em -> chỉ mô hình nhi
     const m = Array.isArray(App.vmeta.methods) ? App.vmeta.methods : ['Goti 2018', 'Collin 2019'];
     return m.filter((x) => isAdmin() || !String(x).startsWith('tucuxi.'));     // v0.21.0: tucuxi.* chỉ admin
+  },
+  // ---------------- v0.22.0: chế độ Trẻ em (giống Tab 4 v11.11.26)
+  childMethods() { return Array.isArray(App.vmeta.child_methods) ? App.vmeta.child_methods : ['Collin 2019']; },
+  num(s) { const v = parseFloat(String(s ?? '').replace(',', '.').trim()); return Number.isFinite(v) ? v : null; },
+  ageYears() {
+    const vs = App.vs;
+    if (!vs.child) { const a = this.num(vs.age); return a == null ? 50 : a; }
+    return Math.max(this.num(vs.ageY) || 0, 0) + Math.max(this.num(vs.ageM) || 0, 0) / 12;
+  },
+  gaWeeks() {
+    const vs = App.vs;
+    if (String(vs.ga ?? '').trim() === '') return 40;
+    const v = this.num(vs.ga);
+    return (v != null && v >= 20 && v <= 45) ? v : null;
+  },
+  gaMessage() {
+    const v = this.gaWeeks();
+    if (v == null) return ['error', `❌ Tuổi thai lúc sinh phải là số từ 20 đến 45 tuần (đang nhập «${App.vs.ga}») — chưa tính được.`];
+    return v < 24 ? ['warn', '⚠️ Tuổi thai < 24 tuần: ít dữ liệu trong nghiên cứu gốc — kết quả kém tin cậy.'] : ['', ''];
+  },
+  vi(x, d) { return x.toFixed(d).replace('.', ','); },
+  roundChildDose(mg) { const st = mg < 100 ? 1 : (mg < 500 ? 5 : 25); return Math.max(st, Math.floor(mg / st + 0.5) * st); },
+  applyChildDefaultDose() {
+    const vs = App.vs;
+    if (!vs.child) return;
+    const w = this.num(vs.weight); if (!w || w <= 0) return;
+    const d0 = this.num(vs.newDose), t0 = this.num(vs.newTau);
+    const auto = vs.autoReg;
+    if ((d0 === 1000 && t0 === 12) || (auto && d0 === this.num(auto[0]) && t0 === this.num(auto[1]))) {
+      const d = g(this.roundChildDose(15 * w));
+      vs.autoReg = [d, '6'];
+      if (this.num(d) !== d0 || t0 !== 6) { vs.newDose = d; vs.newTau = '6'; vs.newTinf = '1'; vs.proj = null; }
+    }
+  },
+  restoreAdultDose() {
+    const vs = App.vs, auto = vs.autoReg;
+    if (!auto) return;
+    if (this.num(vs.newDose) === this.num(auto[0]) && this.num(vs.newTau) === this.num(auto[1])) {
+      vs.newDose = '1000'; vs.newTau = '12'; vs.newTinf = '1'; vs.proj = null;
+    }
+    vs.autoReg = null;
+  },
+  toggleChild(on) {
+    const vs = App.vs;
+    if (on === vs.child) return;
+    if (on) {
+      const a0 = this.num(vs.age) || 0;
+      if (a0 > 0 && a0 < 18) { const y = Math.floor(a0); vs.ageY = String(y); vs.ageM = g(Math.round((a0 - y) * 1200) / 100); }
+      vs.child = true;
+      if (!this.childMethods().includes(vs.method)) vs.method = this.childMethods()[0];
+      this.applyChildDefaultDose();
+    } else {
+      const yrs = this.ageYears();
+      vs.child = false;
+      if (yrs > 0) vs.age = g(Math.round(yrs * 10000) / 10000);
+      vs.heelprick = false;
+      this.restoreAdultDose();
+    }
+    this.changed(); vs.lastMsg = 'ℹ️ Đã đổi chế độ Trẻ em / Người lớn — bấm «Chạy tối ưu Bayes» để tính lại.'; redraw();
+  },
+  ageWarn() {
+    const vs = App.vs, yrs = this.ageYears();
+    if (!vs.child && yrs > 0 && yrs < 18) return '⚠️ BN < 18 tuổi — tích «Trẻ em» nếu là bệnh nhi.';
+    if (vs.child && yrs >= 18) return '⚠️ Tuổi ≥ 18 — kiểm tra lại ô «Trẻ em».';
+    return '';
+  },
+  mgkgDay(dose, tau) {
+    const w = this.num(App.vs.weight), d = this.num(dose), t = this.num(tau);
+    if (!w || w <= 0 || d == null || !t || t <= 0) return null;
+    return d * 24 / t / w;
   },
   buildPatient(p) {
     const vs = App.vs;
     const c = ui.card(p);
     ui.field(c, 'MSYT (bắt buộc để lưu / tải dữ liệu)', vs.msyt, (v) => { vs.msyt = v.trim(); }, { numeric: false });
+    ui.check(c, 'Trẻ em', vs.child, (b) => this.toggleChild(b));          // v0.22.0
     const r1 = ui.row(c);
     ui.choice(ui.cell(r1), 'Giới tính', ['nam', 'nữ'], vs.gender, (_, v) => { vs.gender = v; this.changed(); });
-    ui.field(ui.cell(r1), 'Tuổi', vs.age, (v) => { vs.age = v; this.changed(); });
+    let eq = null;
+    const ageCell = ui.cell(r1);
+    const warn = ui.text(c, '', 13, '#9A6700', false, 2);
+    const refreshAge = () => { warn.textContent = this.ageWarn(); if (eq) eq.textContent = '= ' + this.vi(this.ageYears(), 2) + ' năm'; };
+    if (vs.child) {
+      const ar = ui.row(ageCell);
+      ui.field(ui.cell(ar), 'Tuổi (năm)', vs.ageY, (v) => { vs.ageY = v; this.changed(); refreshAge(); });
+      ui.field(ui.cell(ar), 'Tháng (có thể lẻ)', vs.ageM, (v) => { vs.ageM = v; this.changed(); refreshAge(); });
+      eq = ui.text(ageCell, '', 12, Col.muted, false, 0);
+    } else {
+      ui.field(ageCell, 'Tuổi', vs.age, (v) => { vs.age = v; this.changed(); refreshAge(); });
+    }
+    refreshAge();
     const r2 = ui.row(c);
     ui.field(ui.cell(r2), 'Chiều cao (cm)', vs.height, (v) => { vs.height = v; this.changed(); });
-    ui.field(ui.cell(r2), 'Cân nặng (kg)', vs.weight, (v) => { vs.weight = v; this.changed(); });
+    ui.field(ui.cell(r2), 'Cân nặng (kg)', vs.weight, (v) => { vs.weight = v; this.changed(); this.applyChildDefaultDose(); });
     // v0.19.0 (giống Tab 4 v06.11.26b): chọn mô hình, tuỳ chọn, chú thích, cảnh báo BMI ở bước «Mô hình & kết quả Bayes»
     ui.hint(c, 'Mô hình tiền nghiệm chọn ở bước «Mô hình & kết quả Bayes» (ngay trên nút Chạy tối ưu Bayes).');
   },
@@ -1223,8 +1313,21 @@ const VancoSteps = {
     const ch = () => { this.changed(); vs.lastMsg = 'ℹ️ Đã đổi tuỳ chọn mô hình — bấm «Chạy tối ưu Bayes» để tính lại.'; redraw(); };
     const opt = add(c, ui.vbox()); opt.style.paddingLeft = '16px';
     if (fl.includes('dialysis')) ui.check(opt, 'Đang lọc máu (Hemodialysis)', vs.dialysis, (b) => { vs.dialysis = b; ch(); });
+    if (vs.child && vs.method === 'Collin 2019') {                    // v0.22.0: khung thông số trẻ em
+      ui.text(opt, 'Thông số trẻ em (Collin 2019)', 14, Col.text, true, 6);
+      ui.field(opt, 'Tuổi thai lúc sinh (tuần) — mặc định 40 (đủ tháng); chỉ sửa khi sinh non', vs.ga, (v) => { vs.ga = v; this.changed(); refreshGa(); });
+      const pmaT = ui.text(opt, '', 13, Col.text, false, 0);
+      const gaT = ui.text(opt, '', 13, '#9A6700', false, 0);
+      const refreshGa = () => {
+        const gw = this.gaWeeks();
+        pmaT.textContent = gw == null ? '→ PMA = --' : '→ PMA = ' + this.vi(gw + this.ageYears() * 52.1429, 1) + ' tuần (tuổi thai + tuổi sau sinh)';
+        const [lv, tx] = this.gaMessage();
+        gaT.textContent = tx; gaT.style.color = lv === 'error' ? Col.red : '#9A6700';
+      };
+      refreshGa();
+      ui.check(opt, 'Mẫu lấy gót chân - Heel-prick (STDY13)', vs.heelprick, (b) => { vs.heelprick = b; ch(); });
+    }
     if (fl.includes('malignancy')) ui.check(opt, 'Bệnh máu ác tính (STDY10)', vs.malignancy, (b) => { vs.malignancy = b; ch(); });
-    if (fl.includes('heelprick')) ui.check(opt, 'Mẫu lấy gót chân - Heel-prick (STDY13)', vs.heelprick, (b) => { vs.heelprick = b; ch(); });
     if (fl.includes('gpos')) ui.check(opt, 'Nhiễm khuẩn Gram dương (dis_gpos — Yamamoto)', vs.gpos, (b) => { vs.gpos = b; ch(); });
     if (fl.includes('hf')) {
       ui.check(opt, 'Suy tim (Komatsu 2025)', vs.hf, (b) => { vs.hf = b; ch(); });
@@ -1234,7 +1337,7 @@ const VancoSteps = {
       const inf = Array.isArray(App.vmeta.infections) ? App.vmeta.infections : ['Chung', 'Nhiễm khuẩn huyết', 'Viêm phổi', 'Khác'];
       ui.choice(opt, 'Loại nhiễm khuẩn (Yamamoto 2009)', inf, vs.infection, (_, v) => { vs.infection = v; ch(); });
     }
-    ui.text(c, (App.vmeta.population || {})[vs.method] || '', 13, Col.muted, false, 8).style.whiteSpace = 'pre-line';
+    ui.text(c, ((vs.child ? App.vmeta.population_child : App.vmeta.population) || {})[vs.method] || '', 13, Col.muted, false, 8).style.whiteSpace = 'pre-line';
     const [hTxt, hBtn] = this.bmiHint();
     if (hTxt) {
       ui.text(c, hTxt, 13, '#9A6700', false, 6);
@@ -1261,7 +1364,10 @@ const VancoSteps = {
     if (r.priors) {
       const pr = r.priors;
       const c = ui.fold(ui.card(box), 'Tham số tiền nghiệm — ' + vs.method);
-      ui.metrics(c, [['CrCl (mL/phút)', String(pr.crcl ?? '')], ['CLprior (L/h)', String(pr.cl ?? '')], ['Vc,prior (L)', String(pr.vc ?? '')], ['Vp,prior (L)', String(pr.vp ?? '')]]);
+      ui.metrics(c, pr.pma != null    // v0.22.0: trẻ em
+        ? [['CLprior (L/h)', String(pr.cl ?? '')], ['Vc,prior (L)', String(pr.vc ?? '')], ['Vp,prior (L)', String(pr.vp ?? '')],
+           ['PMA (tuần)', String(pr.pma)], ['SCr chuẩn theo tuổi (mg/dL)', String(pr.scr_std ?? '')]]
+        : [['CrCl (mL/phút)', String(pr.crcl ?? '')], ['CLprior (L/h)', String(pr.cl ?? '')], ['Vc,prior (L)', String(pr.vc ?? '')], ['Vp,prior (L)', String(pr.vp ?? '')]]);
       ui.text(c, pr.info || '', 12, Col.muted, false, 8);
       if (pr.warn) ui.text(box, pr.warn, 13, '#9A6700', false, 6);
     }
@@ -1297,10 +1403,14 @@ const VancoSteps = {
     const c = ui.card(p);
     ui.header(c, 'Phác đồ so sánh');
     ui.hint(c, 'Phác đồ mới bắt đầu từ: giờ liều cuối đã nhập + τ mới. Dòng «đang dùng» được thêm tự động.');
+    this.applyChildDefaultDose();                                    // v0.22.0: hồ sơ trẻ em vừa tải -> 15 mg/kg q6h
     const r1 = ui.row(c);
-    ui.field(ui.cell(r1), 'Liều (mg)', vs.newDose, (v) => { vs.newDose = v; vs.proj = null; });
-    ui.field(ui.cell(r1), 'τ (giờ)', vs.newTau, (v) => { vs.newTau = v; vs.proj = null; });
+    let mk = null;
+    const refreshMk = () => { if (mk) { const v = this.mgkgDay(vs.newDose, vs.newTau); mk.textContent = v == null ? '' : '= ' + this.vi(v, 1) + ' mg/kg/ngày'; } };
+    ui.field(ui.cell(r1), 'Liều (mg)', vs.newDose, (v) => { vs.newDose = v; vs.proj = null; refreshMk(); });
+    ui.field(ui.cell(r1), 'τ (giờ)', vs.newTau, (v) => { vs.newTau = v; vs.proj = null; refreshMk(); });
     ui.field(ui.cell(r1), 'Tinf (giờ)', vs.newTinf, (v) => { vs.newTinf = v; vs.proj = null; });
+    if (vs.child) { mk = ui.text(c, '', 14, Col.text, true, 4); refreshMk(); }
     vs.extraRegs.forEach((g, i) => {
       const rr = ui.row(c);
       ui.field(ui.cell(rr), 'Liều (mg)', g[0], (v) => { g[0] = v; vs.proj = null; });
@@ -1326,14 +1436,17 @@ const VancoSteps = {
     ui.header(c, 'So sánh phác đồ — AUC24h (mg·h/L)');
     const d0 = items[0].days[0];
     ui.hint(c, `Ngày TDM (${d0.date}, liều đã dùng): ${d0.auc} · CL bệnh nhân ${pr.cl} L/h`);
-    const head = add(c, el('div', 'pmx pmx-h'));
-    ['Phác đồ', '+1', '+2', '+3', '+4', 'Cân bằng'].forEach((t, i) => add(head, el('div', i === 5 ? 'pmx-ss' : null, t)));
+    const kid = !!vs.child;                                          // v0.22.0: thêm cột mg/kg/ngày
+    const head = add(c, el('div', 'pmx pmx-h' + (kid ? ' pmx-kid' : '')));
+    (kid ? ['Phác đồ', 'mg/kg/ngày', '+1', '+2', '+3', '+4', 'Cân bằng'] : ['Phác đồ', '+1', '+2', '+3', '+4', 'Cân bằng'])
+      .forEach((t, i, arr) => add(head, el('div', i === arr.length - 1 ? 'pmx-ss' : null, t)));
     items.forEach((it, i) => {
-      const row = add(c, el('button', 'pmx pmx-row' + (i === vs.projSel ? ' sel' : '')));
+      const row = add(c, el('button', 'pmx pmx-row' + (i === vs.projSel ? ' sel' : '') + (kid ? ' pmx-kid' : '')));
       const lab = add(row, el('div', 'pmx-lab'));
       add(lab, el('b', null, it.label));
       const sub = it.current ? 'đang dùng' : (i === vs.projSel ? 'đang xem' : '');
       if (sub) add(lab, el('span', null, sub));
+      if (kid) { const v = this.mgkgDay(it.dose, it.tau); add(row, el('div', 'pmx-mk', v == null ? '--' : this.vi(v, 1))); }
       for (let k = 1; k <= 4; k++) add(row, el('div', 'pchip st-' + it.days[k].status, String(it.days[k].auc)));
       add(row, el('div', 'pchip solid st-' + it.ss.status, it.ss.text));
       row.addEventListener('click', (ev) => { ev.preventDefault(); vs.projSel = i; redraw(); });

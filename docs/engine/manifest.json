@@ -1,16 +1,16 @@
 {
- "version": "20261108-c8b7f92c",
- "file": "engine-20261108-c8b7f92c.bin",
- "sha256": "c8b7f92c7bb24deaa07885058c50103ccc8847e796649f3a81680ea18fd21fc1",
- "key": "DmTezu8Q57ZPWv5lUpHSWozQ6HF3mYUuh/sGM9X+UNaE5ZfeDLrkNP1rbNV9y8WzI/R/YT88E/tbEPCQkNo9g/3KB52lM+/pprcyVGT0YuzEqgwGbkNXqYTeUq0f5VP5YWjNY1+mQD/rJ+u4yjYo6y7iMGh0AwneO2kqCaq6Dnpc+khTs6syjIxsYJVcN1kxa/3R7oMBENmJGUAInS93WBpnhCpGzk3ke44BBcfoQ+iHIxdo5IGvmsVwTfqhU5/KnGNaKpDKTncXMiUeyZuM9sPJyWNUezOiVQS+JWYTk6XFHBUgohK/y2wUwNMxBj3xkt2b1AxcekWRHOiuhCKkyuWlipHUXRFTEgosUOiuJjYHyw139tI+FgXN/xi+gzQDAP7QQhbM6mgY+ANEjFsJGA4OPEWnkNbOx+fYyCqeVDUsOtid9XREHZfek9qHq/b2VdUS+BTeiq26BQi5udnWmg3lonycw+P9/iwkhXedTzZlxkdIKCPD+PyWMEO38hw4",
- "iv": "/TOjGfSJ9pr7osN6",
+ "version": "20261111-46bb9b9c",
+ "file": "engine-20261111-46bb9b9c.bin",
+ "sha256": "46bb9b9c9ffdc732669d774494c4e4b2b0e4c9c3ab78f30179f66879485d6355",
+ "key": "QaY+56GzFM2kJxFRhH85HJv8pF5aEwx6hPxcJzLEgMWQfeXhcNsYnYCesS36+9C706MYq8NZK+5HoIUfCuu6G7p2WmXqr1CMMLAd67ao80hGHJBPMEUw5Su+jslVZJV96XVeK9Zf8Lf6RqzAK+o56+Fw6zuPH+lPVFztlVoYaYBvycBJEAb612nOQFIZdffUohuaMO+pXeaIBEGxMk1CJ89OAdD6wJuXE7TXq/RQHJKM1BOovcXZz1QXOzTOGWcT+HdLnIyZOKjR8f6JRIwhhk0KgKuZumg4z26eBn7yCuS/MuFVh5R5VLyp1RnskWKkELFjauIyZKpXklkafeDcWokrX91zT6eWL1z5NxfsSUKrRAt2LRObwpOYlmD96UuiYbZS69GjqpCYaltdRV957GLvxzOoycbEIsWUumaJDW4wV8XNg/GBI6o1ss10uYG6hxbvJcfaxo1oeDD4XEBz7ZrHTIeizv77muEYZTxZ/mtwDBbFqOPzM4r7RC7GDamc",
+ "iv": "BCafdyPDZY59Ibue",
  "files": 18,
  "python": "3.12",
  "pyodide": "0.27.7",
- "built": "2026-11-08T15:58:56.824884+00:00",
+ "built": "2026-11-11T15:43:29.838949+00:00",
  "ks": {
-  "file": "ks-65355e0c1f80.zip",
-  "sha256": "65355e0c1f80f73b24e0b6f1181c5d4939e106c162dfc8f23ffb3b5403283330",
+  "file": "ks-da7e08a419f4.zip",
+  "sha256": "da7e08a419f43370e8bc476a5a46aeeb2985f9a1039f2f1aa18a1cd0464b0ac7",
   "files": 6
  }
 }
