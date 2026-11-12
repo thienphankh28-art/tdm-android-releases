@@ -1,10 +1,10 @@
 {
- "versionCode": 28,
- "versionName": "0.22.0",
- "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.22.0/tdm-amg-0.22.0.apk",
- "sha256": "e65d957b7acc781c8d8c41437978a7759758b02fa461593b7a532000dbc962b4",
- "size": 49698793,
- "notes": "TDM AMG 0.22.0\n\n- Vancomycin: thêm chế độ «Trẻ em» (ô tích ở bước Bệnh nhân), giống bản máy tính v11.11.26. Không tích = người lớn, kết quả không đổi.\n- Trẻ em: tuổi nhập năm + tháng (tháng có thể lẻ); chỉ dùng Collin 2019; nhập tuổi thai lúc sinh (20–45 tuần, mặc định 40), PMA tự tính; tiền nghiệm hiện PMA và SCr chuẩn theo tuổi.\n- Bayes trẻ em: giới hạn quanh tiền nghiệm ±5ω (bỏ giới hạn cứng của người lớn vốn ép sai trẻ < 8 kg), CL và Q2 theo V1/V2 cá thể như bài gốc; chạm giới hạn thì báo đỏ, không tính AUC/dự đoán, không lưu.\n- Liều mới: trẻ em mặc định 15 mg/kg mỗi 6 giờ, hiện mg/kg/ngày ở ô liều và bảng so sánh phác đồ.\n- Người lớn: ô «Mẫu lấy gót chân» (Collin) được ẩn và không dùng.\n- Lưu thêm cờ trẻ em và tuổi thai (cần đã chạy sql_tre_em_vanco.sql trên Supabase). Bản iPhone cập nhật cùng lúc.",
+ "versionCode": 29,
+ "versionName": "0.23.0",
+ "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.23.0/tdm-amg-0.23.0.apk",
+ "sha256": "0d16fe173dbc54dd6b8e83779f3bbbf1449f9afa3fc0402c3de07476411b5002",
+ "size": 49699441,
+ "notes": "TDM AMG 0.23.0\n\n- Vancomycin trẻ em: thêm 2 mô hình 1 ngăn Oda 2025 và Le 2013, giống bản máy tính v12.11.26. Collin 2019 vẫn là mặc định.\n- Oda và Le chỉ dùng cho trẻ từ 3 tháng tuổi (dưới 3 tháng báo đỏ, không tính). Oda có sàn SCr theo tuổi; cảnh báo khi Oda dùng cho trẻ > 15 tuổi hoặc Le có SCr < 0,2 mg/dL.\n- Bayes Oda/Le: giới hạn ±5ω quanh tiền nghiệm, sai số dạng log, chạy được tuần tự và «Chọn gộp»; chạm giới hạn thì báo đỏ, không tính AUC, không lưu.\n- Bảng tiền/hậu nghiệm hiện «V — 1 ngăn» (không có Vp). Mục liều mới, AUC, đồ thị tính theo 1 ngăn.\n- Bỏ tích «Trẻ em» khi đang chọn Oda/Le: tự chuyển về Collin 2019. Trẻ em không còn hiện gợi ý Komatsu.\n- Người lớn không đổi. Không cần chạy SQL mới. Bản iPhone cập nhật cùng lúc.",
  "required": false,
- "date": "2026-11-11"
+ "date": "2026-11-12"
 }
