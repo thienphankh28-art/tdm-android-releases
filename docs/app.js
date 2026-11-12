@@ -1181,6 +1181,7 @@ const VancoSteps = {
       vs.child = false;
       if (yrs > 0) vs.age = g(Math.round(yrs * 10000) / 10000);
       vs.heelprick = false;
+      if (vs.method === 'Oda 2025' || vs.method === 'Le 2013') vs.method = 'Collin 2019';   // v0.23.0
       this.restoreAdultDose();
     }
     this.changed(); vs.lastMsg = 'ℹ️ Đã đổi chế độ Trẻ em / Người lớn — bấm «Chạy tối ưu Bayes» để tính lại.'; redraw();
@@ -1225,6 +1226,7 @@ const VancoSteps = {
   // (thong bao, co hien nut "Dung Komatsu") -- giong _update_bmi_hint() cua Tab 4 v26.10.26b
   bmiHint() {
     const vs = App.vs;
+    if (vs.child) return ['', false];                                  // v0.23.0: trẻ em không có Komatsu -> không gợi ý
     const h = parseFloat(String(vs.height).replace(',', '.')) || 0, w = parseFloat(String(vs.weight).replace(',', '.')) || 0;
     if (h <= 0 || w <= 0) return ['', false];
     const bmi = w / Math.pow(h / 100, 2), b = bmi.toFixed(1), k = vs.method === KOMATSU;
@@ -1364,7 +1366,10 @@ const VancoSteps = {
     if (r.priors) {
       const pr = r.priors;
       const c = ui.fold(ui.card(box), 'Tham số tiền nghiệm — ' + vs.method);
-      ui.metrics(c, pr.pma != null    // v0.22.0: trẻ em
+      ui.metrics(c, pr.one_cmt          // v0.23.0: Oda / Le — 1 ngăn
+        ? [['CLprior (L/h)', String(pr.cl ?? '')], ['V,prior (L) — 1 ngăn', String(pr.vc ?? '')]]
+            .concat(pr.scr_floor != null ? [['SCr sàn theo tuổi (mg/dL)', String(pr.scr_floor)]] : [])
+        : pr.pma != null    // v0.22.0: trẻ em
         ? [['CLprior (L/h)', String(pr.cl ?? '')], ['Vc,prior (L)', String(pr.vc ?? '')], ['Vp,prior (L)', String(pr.vp ?? '')],
            ['PMA (tuần)', String(pr.pma)], ['SCr chuẩn theo tuổi (mg/dL)', String(pr.scr_std ?? '')]]
         : [['CrCl (mL/phút)', String(pr.crcl ?? '')], ['CLprior (L/h)', String(pr.cl ?? '')], ['Vc,prior (L)', String(pr.vc ?? '')], ['Vp,prior (L)', String(pr.vp ?? '')]]);
@@ -1374,7 +1379,8 @@ const VancoSteps = {
     if (!r.ok) return;
     const k = r.cards;
     const c = ui.fold(ui.card(box), 'Kết quả hậu nghiệm');
-    ui.metrics(c, [['CL_optimized (L/h)', k.cl], ['Vc_optimized (L)', k.vc], ['Vp_optimized (L)', k.vp], ['C_pred_final (μg/mL)', k.cpred],
+    ui.metrics(c, [['CL_optimized (L/h)', k.cl], [k.one_cmt ? 'V_optimized (L) — 1 ngăn' : 'Vc_optimized (L)', k.vc],
+      ['Vp_optimized (L)', k.vp], ['C_pred_final (μg/mL)', k.cpred],
       ['OFV_final', k.ofv], ['k10 (h⁻¹)', k.k10], ['k12 (h⁻¹)', k.k12], ['k21 (h⁻¹)', k.k21], ['α (h⁻¹)', k.alpha], ['β (h⁻¹)', k.beta]].map(([a, b]) => [a, String(b ?? '')]));
     const c2 = ui.card(box);
     ui.header(c2, 'AUC24h');
