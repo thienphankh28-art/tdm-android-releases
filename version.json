@@ -1,10 +1,10 @@
 {
- "versionCode": 29,
- "versionName": "0.23.0",
- "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.23.0/tdm-amg-0.23.0.apk",
- "sha256": "0d16fe173dbc54dd6b8e83779f3bbbf1449f9afa3fc0402c3de07476411b5002",
- "size": 49699441,
- "notes": "TDM AMG 0.23.0\n\n- Vancomycin trẻ em: thêm 2 mô hình 1 ngăn Oda 2025 và Le 2013, giống bản máy tính v12.11.26. Collin 2019 vẫn là mặc định.\n- Oda và Le chỉ dùng cho trẻ từ 3 tháng tuổi (dưới 3 tháng báo đỏ, không tính). Oda có sàn SCr theo tuổi; cảnh báo khi Oda dùng cho trẻ > 15 tuổi hoặc Le có SCr < 0,2 mg/dL.\n- Bayes Oda/Le: giới hạn ±5ω quanh tiền nghiệm, sai số dạng log, chạy được tuần tự và «Chọn gộp»; chạm giới hạn thì báo đỏ, không tính AUC, không lưu.\n- Bảng tiền/hậu nghiệm hiện «V — 1 ngăn» (không có Vp). Mục liều mới, AUC, đồ thị tính theo 1 ngăn.\n- Bỏ tích «Trẻ em» khi đang chọn Oda/Le: tự chuyển về Collin 2019. Trẻ em không còn hiện gợi ý Komatsu.\n- Người lớn không đổi. Không cần chạy SQL mới. Bản iPhone cập nhật cùng lúc.",
+ "versionCode": 30,
+ "versionName": "0.24.0",
+ "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.24.0/tdm-amg-0.24.0.apk",
+ "sha256": "ee6b05bceec84b59d1cee440a2a217a634a2a88ae92cc7257c5046cbde0fd3af",
+ "size": 49697413,
+ "notes": "TDM AMG 0.24.0\n\n- Vancomycin: cập nhật bộ tính giống bản máy tính v20.11.26c (V.2.9.1). Mô hình 2 ngăn tính bằng công thức giải tích α, β thay cho phép tính ma trận cũ; tự quay về cách tính cũ khi cần. Chạy Bayes nhanh hơn rõ rệt (bản máy tính nhanh khoảng 3–9 lần).\n- Kết quả giống bản trước: lệch ≤ 0,03% (OFV ≤ 0,0001), đã kiểm trên dữ liệu thật 2025–2026 và quần thể giả lập.\n- Giao diện, các mô hình, cách lưu dữ liệu không đổi. Không cần chạy SQL mới. Bản iPhone cập nhật cùng lúc.",
  "required": false,
- "date": "2026-11-12"
+ "date": "2026-11-20"
 }
