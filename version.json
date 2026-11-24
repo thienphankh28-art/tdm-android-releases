@@ -1,10 +1,10 @@
 {
- "versionCode": 30,
- "versionName": "0.24.0",
- "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.24.0/tdm-amg-0.24.0.apk",
- "sha256": "ee6b05bceec84b59d1cee440a2a217a634a2a88ae92cc7257c5046cbde0fd3af",
- "size": 49697413,
- "notes": "TDM AMG 0.24.0\n\n- Vancomycin: cập nhật bộ tính giống bản máy tính v20.11.26c (V.2.9.1). Mô hình 2 ngăn tính bằng công thức giải tích α, β thay cho phép tính ma trận cũ; tự quay về cách tính cũ khi cần. Chạy Bayes nhanh hơn rõ rệt (bản máy tính nhanh khoảng 3–9 lần).\n- Kết quả giống bản trước: lệch ≤ 0,03% (OFV ≤ 0,0001), đã kiểm trên dữ liệu thật 2025–2026 và quần thể giả lập.\n- Giao diện, các mô hình, cách lưu dữ liệu không đổi. Không cần chạy SQL mới. Bản iPhone cập nhật cùng lúc.",
+ "versionCode": 31,
+ "versionName": "0.25.0",
+ "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.25.0/tdm-amg-0.25.0.apk",
+ "sha256": "df2fc8e4df35c627bdc56d708aec9be6791bf1bde15a1df06e67a72770821d4a",
+ "size": 49714429,
+ "notes": "TDM AMG 0.25.0\n\n- Vancomycin: thêm 3 mô hình 1 ngăn người lớn: Ying 2018, Buelga 2005, Roberts 2011 (CKD-EPI 2021). Giống bản máy tính v24.11.26c.\n- Buelga: SCr chuẩn IDMS được quy đổi sang dạng cũ (× 1,065 + 0,067); cân nặng trong Cockcroft–Gault chọn theo BMI, giống chức năng tính liều kháng sinh (BMI < 18,5 dùng CN thực; 18,5–25 dùng CN lý tưởng; ≥ 25 dùng CN hiệu chỉnh).\n- Các mô hình cũ không đổi. Không cần chạy SQL mới. Bản iPhone cập nhật cùng lúc.",
  "required": false,
- "date": "2026-11-20"
+ "date": "2026-11-24"
 }
