@@ -1367,7 +1367,8 @@ const VancoSteps = {
       const pr = r.priors;
       const c = ui.fold(ui.card(box), 'Tham số tiền nghiệm — ' + vs.method);
       ui.metrics(c, pr.one_cmt          // v0.23.0: Oda / Le — 1 ngăn
-        ? [['CLprior (L/h)', String(pr.cl ?? '')], ['V,prior (L) — 1 ngăn', String(pr.vc ?? '')]]
+        ? ((pr.crcl && !String(pr.crcl).startsWith('—')) ? [['CrCl (mL/phút)', String(pr.crcl)]] : [])   // v0.25.0: 1 ngăn người lớn
+            .concat([['CLprior (L/h)', String(pr.cl ?? '')], ['V,prior (L) — 1 ngăn', String(pr.vc ?? '')]])
             .concat(pr.scr_floor != null ? [['SCr sàn theo tuổi (mg/dL)', String(pr.scr_floor)]] : [])
         : pr.pma != null    // v0.22.0: trẻ em
         ? [['CLprior (L/h)', String(pr.cl ?? '')], ['Vc,prior (L)', String(pr.vc ?? '')], ['Vp,prior (L)', String(pr.vp ?? '')],
