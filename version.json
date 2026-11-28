@@ -1,10 +1,10 @@
 {
- "versionCode": 33,
- "versionName": "0.26.1",
- "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.26.1/tdm-amg-0.26.1.apk",
- "sha256": "3dcf346afdaef122fa44d7c59bf2a45b65f1258f38513ac9aa61af701e17a6ac",
- "size": 49748633,
- "notes": "TDM AMG 0.26.1\n\n- Vancomycin: ô tuổi / chiều cao / cân nặng để trống hoặc không phải số -> không tính tiền nghiệm, Bayes và gợi ý liều, báo nhập đủ (trước đây phần mềm ngầm dùng 50 tuổi / 165 cm / 60 kg).\n- Gợi ý liều khởi đầu: liều nạp tối đa 3000 mg vẫn chưa đạt AUC0–24 đích -> báo rõ theo từng mô hình.\n- Chế độ tự nhập liều: khoảng đưa liều phải ≥ 4 h; thời gian truyền (nhập hoặc tự đặt) không dài hơn khoảng đưa liều; không nhận số âm; liều viết dạng «1,000» / «1.500» bị chặn kèm hướng dẫn (dấu phẩy/chấm là dấu thập phân). Khi tự nhập, các ô của phần gợi ý được làm mờ.\n- Nhãn liều nạp ngắn gọn hơn trên điện thoại. Giống bản máy tính Tab 4 V28.11.26e. Không cần chạy SQL mới. Bản iPhone cập nhật cùng lúc.",
+ "versionCode": 34,
+ "versionName": "0.26.2",
+ "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.26.2/tdm-amg-0.26.2.apk",
+ "sha256": "0046434bc9941856ea51aa0fb38a716da012217cf463dd64b6ba96177afaaf64",
+ "size": 49748357,
+ "notes": "TDM AMG 0.26.2\n\n- Gợi ý liều khởi đầu, chế độ tự nhập liều: khi số liệu nhập bị chặn (ví dụ liều «1,000», τ < 4 h), câu báo hiện trong hộp đỏ, chữ đậm «⛔ Chưa tính được chế độ liều tự nhập: …» và bảng kết quả để trống.\n- Dòng thông tin thu gọn: «SCr bắt đầu: … mg/dL (ngày giờ), ClCr … mL/p».\n- Giống bản máy tính Tab 4 V28.11.26f. Không cần chạy SQL mới. Bản iPhone cập nhật cùng lúc.",
  "required": false,
  "date": "2026-11-28"
 }
