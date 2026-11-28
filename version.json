@@ -1,10 +1,10 @@
 {
- "versionCode": 31,
- "versionName": "0.25.0",
- "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.25.0/tdm-amg-0.25.0.apk",
- "sha256": "df2fc8e4df35c627bdc56d708aec9be6791bf1bde15a1df06e67a72770821d4a",
- "size": 49714429,
- "notes": "TDM AMG 0.25.0\n\n- Vancomycin: thêm 3 mô hình 1 ngăn người lớn: Ying 2018, Buelga 2005, Roberts 2011 (CKD-EPI 2021). Giống bản máy tính v24.11.26c.\n- Buelga: SCr chuẩn IDMS được quy đổi sang dạng cũ (× 1,065 + 0,067); cân nặng trong Cockcroft–Gault chọn theo BMI, giống chức năng tính liều kháng sinh (BMI < 18,5 dùng CN thực; 18,5–25 dùng CN lý tưởng; ≥ 25 dùng CN hiệu chỉnh).\n- Các mô hình cũ không đổi. Không cần chạy SQL mới. Bản iPhone cập nhật cùng lúc.",
+ "versionCode": 32,
+ "versionName": "0.26.0",
+ "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.26.0/tdm-amg-0.26.0.apk",
+ "sha256": "5fc1c268580fba009c9c633dd2a54cec4a36cfdfc714c72e40d9d5add435069a",
+ "size": 49730757,
+ "notes": "TDM AMG 0.26.0\n\n- Vancomycin: thêm «💡 Gợi ý liều khởi đầu» (nút trên thẻ SCr thứ 1) — giống bản máy tính Tab 4 V28.11.26d.\n  • Dùng SCr/urê lúc bắt đầu dùng vancomycin; thêm SCr sau không làm đổi gợi ý.\n  • Gợi ý theo AUC đích: liều/ngày = AUC đích × CL tiền nghiệm từng mô hình và TB 3 mô hình (Goti, Collin, Yamamoto; thêm Komatsu khi BMI ≥ 25). Khoảng cách theo eCrCl (PNT) hoặc theo t½; liều nạp mg/kg CN thực (≤ 3000 mg).\n  • «✍ Tự nhập liều»: nhập liều nạp, liều duy trì, khoảng đưa liều, thời gian truyền → ước tính AUC24 ổn định, AUC ngày 1, đáy/đỉnh theo từng mô hình.\n  • Trẻ em: mô hình nhi (Collin, Oda, Le), hiện thêm mg/kg/ngày.\n- Ô Urê luôn hiện ở bước SCr (tùy chọn).\n- Không cần chạy SQL mới. Bản iPhone cập nhật cùng lúc.",
  "required": false,
- "date": "2026-11-24"
+ "date": "2026-11-28"
 }
