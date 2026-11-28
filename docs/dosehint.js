@@ -1,4 +1,5 @@
 // Cập nhật: 28/11/2026 — v0.26.0 (giống DoseHint.kt và Tab 4 V28.11.26d trên máy tính)
+// Cập nhật: 28/11/2026 20:50 — v0.26.1: chế độ tự nhập làm mờ ô AUC/khoảng cách/làm tròn/liều nạp (giống desktop); nhãn liều nạp ngắn
 // «💡 Gợi ý liều khởi đầu»: SCr/urê LÚC BẮT ĐẦU dùng vancomycin. Hai chế độ: gợi ý theo AUC đích / tự nhập liều
 // -> ước tính AUC từng mô hình. Tính toán do Python (mobile_vanco.v_dose_hint) -> cùng kết quả với bản máy tính.
 // Dùng các hàm chung của ui.js / app.js: ui, Col, g, el, add, openModal, py.
@@ -8,9 +9,9 @@ function doseHint(vs) {
   const TAU_C = [['q6h', '6'], ['q8h', '8'], ['q12h', '12'], ['Theo t½ từng mô hình', 'thalf']];
   const RND_A = [['250 mg', '250'], ['125 mg', '125'], ['500 mg', '500']];
   const RND_C = [['10 mg', '10'], ['25 mg', '25'], ['50 mg', '50']];
-  const LD_A = [['25 mg/kg CN thực, ≤ 3000 mg', '25'], ['20 mg/kg CN thực, ≤ 3000 mg', '20'], ['30 mg/kg CN thực, ≤ 3000 mg', '30'],
-    ['35 mg/kg CN thực, ≤ 3000 mg', '35'], ['Không liều nạp', '0']];
-  const LD_C = [['Không liều nạp', '0'], ['20 mg/kg CN thực, ≤ 3000 mg', '20']];
+  const LD_A = [['25 mg/kg (≤ 3 g)', '25'], ['20 mg/kg (≤ 3 g)', '20'], ['30 mg/kg (≤ 3 g)', '30'],
+    ['35 mg/kg (≤ 3 g)', '35'], ['Không liều nạp', '0']];
+  const LD_C = [['Không liều nạp', '0'], ['20 mg/kg (≤ 3 g)', '20']];
   const opts = (a, c) => (vs.child ? c : a);
   const pick = (o, cur) => (o.some((x) => x[0] === cur) ? cur : o[0][0]);
   const code = (o, cur) => o.find((x) => x[0] === pick(o, cur))[1];
@@ -64,14 +65,16 @@ function doseHint(vs) {
     body.innerHTML = '';
     const c = ui.card(body, 6);
     const r1 = ui.row(c);
-    ui.field(ui.cell(r1), 'AUC24 đích (mg·h/L)', vs.dhAuc, (v) => { vs.dhAuc = v; });
+    const e1 = ui.field(ui.cell(r1), 'AUC24 đích (mg·h/L)', vs.dhAuc, (v) => { vs.dhAuc = v; });
     const to = opts(TAU_A, TAU_C);
-    ui.choice(ui.cell(r1, 1.4), 'Khoảng cách', to.map((x) => x[0]), pick(to, vs.dhTau), (_, v) => { vs.dhTau = v; calc(); });
+    const s1 = ui.choice(ui.cell(r1, 1.4), 'Khoảng cách', to.map((x) => x[0]), pick(to, vs.dhTau), (_, v) => { vs.dhTau = v; calc(); });
     const r2 = ui.row(c);
     const ro = opts(RND_A, RND_C);
-    ui.choice(ui.cell(r2), 'Làm tròn', ro.map((x) => x[0]), pick(ro, vs.dhRound), (_, v) => { vs.dhRound = v; calc(); });
+    const s2 = ui.choice(ui.cell(r2), 'Làm tròn', ro.map((x) => x[0]), pick(ro, vs.dhRound), (_, v) => { vs.dhRound = v; calc(); });
     const lo = opts(LD_A, LD_C);
-    ui.choice(ui.cell(r2, 1.6), 'Liều nạp', lo.map((x) => x[0]), pick(lo, vs.dhLd), (_, v) => { vs.dhLd = v; calc(); });
+    const s3 = ui.choice(ui.cell(r2, 1.6), 'Liều nạp', lo.map((x) => x[0]), pick(lo, vs.dhLd), (_, v) => { vs.dhLd = v; calc(); });
+    // v0.26.1: chế độ tự nhập -> làm mờ các ô của phần gợi ý (giống desktop)
+    [e1, s1, s2, s3].forEach((w) => { w.disabled = vs.dhCustom; w.style.opacity = vs.dhCustom ? '0.45' : ''; });
     const seg = ui.row(c);
     ui.button(ui.cell(seg), 'Gợi ý theo AUC', vs.dhCustom ? Col.gray : Col.greenBtn, 8, () => {
       if (vs.dhCustom) { vs.dhCustom = false; build(); calc(); }
