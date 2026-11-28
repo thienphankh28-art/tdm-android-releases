@@ -1,5 +1,6 @@
 // Cập nhật: 28/11/2026 — v0.26.0 (giống DoseHint.kt và Tab 4 V28.11.26d trên máy tính)
 // Cập nhật: 28/11/2026 20:50 — v0.26.1: chế độ tự nhập làm mờ ô AUC/khoảng cách/làm tròn/liều nạp (giống desktop); nhãn liều nạp ngắn
+// Cập nhật: 28/11/2026 21:20 — v0.26.2: tự nhập bị chặn -> hộp đỏ chữ đậm (giống desktop V28.11.26f)
 // «💡 Gợi ý liều khởi đầu»: SCr/urê LÚC BẮT ĐẦU dùng vancomycin. Hai chế độ: gợi ý theo AUC đích / tự nhập liều
 // -> ước tính AUC từng mô hình. Tính toán do Python (mobile_vanco.v_dose_hint) -> cùng kết quả với bản máy tính.
 // Dùng các hàm chung của ui.js / app.js: ui, Col, g, el, add, openModal, py.
@@ -22,9 +23,10 @@ function doseHint(vs) {
   const m = openModal('💡 Gợi ý liều khởi đầu', [{ label: '✖ Đóng', color: Col.gray, onClick: (close) => close() }]);
   m.body.parentNode.classList.add('full');
   const body = m.body;
-  const msgBox = (s, ok) => {
-    const t = ui.text(res, s, 14, ok ? Col.green : Col.amber, false, 8);
-    t.style.background = ok ? '#DAFBE1' : '#FFF8C5'; t.style.borderRadius = '8px'; t.style.padding = '8px 10px';
+  const msgBox = (s, ok, block = false) => {      // v0.26.2: block -> hộp đỏ (tự nhập bị chặn), giống desktop
+    const t = ui.text(res, s, 14, block ? '#B3261E' : (ok ? Col.green : Col.amber), block, 8);
+    t.style.background = block ? '#FDE2E1' : (ok ? '#DAFBE1' : '#FFF8C5'); t.style.borderRadius = '8px'; t.style.padding = '8px 10px';
+    if (block) t.style.border = '1px solid ' + Col.red;
   };
   const kv = (p, k, v, color) => { ui.text(p, k, 12, Col.muted, false, 4); ui.text(p, v, 16, color, true, 0); };
   const aucColor = (x) => (typeof x !== 'number' || isNaN(x) ? Col.text : (x >= 400 && x <= 600 ? Col.green : Col.red));
@@ -46,7 +48,7 @@ function doseHint(vs) {
   };
   const show = (r) => {
     res.innerHTML = '';
-    if (!r.ok) { msgBox(r.message || 'Không tính được.', false); return; }
+    if (!r.ok) { msgBox(r.message || 'Không tính được.', false, r.level === 'error'); return; }
     ui.hint(res, r.info || '');
     const rows = r.rows || [];
     lastTb = rows.find((x) => x.tb) || rows[0] || null;
