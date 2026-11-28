@@ -1,10 +1,10 @@
 {
- "versionCode": 32,
- "versionName": "0.26.0",
- "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.26.0/tdm-amg-0.26.0.apk",
- "sha256": "5fc1c268580fba009c9c633dd2a54cec4a36cfdfc714c72e40d9d5add435069a",
- "size": 49730757,
- "notes": "TDM AMG 0.26.0\n\n- Vancomycin: thêm «💡 Gợi ý liều khởi đầu» (nút trên thẻ SCr thứ 1) — giống bản máy tính Tab 4 V28.11.26d.\n  • Dùng SCr/urê lúc bắt đầu dùng vancomycin; thêm SCr sau không làm đổi gợi ý.\n  • Gợi ý theo AUC đích: liều/ngày = AUC đích × CL tiền nghiệm từng mô hình và TB 3 mô hình (Goti, Collin, Yamamoto; thêm Komatsu khi BMI ≥ 25). Khoảng cách theo eCrCl (PNT) hoặc theo t½; liều nạp mg/kg CN thực (≤ 3000 mg).\n  • «✍ Tự nhập liều»: nhập liều nạp, liều duy trì, khoảng đưa liều, thời gian truyền → ước tính AUC24 ổn định, AUC ngày 1, đáy/đỉnh theo từng mô hình.\n  • Trẻ em: mô hình nhi (Collin, Oda, Le), hiện thêm mg/kg/ngày.\n- Ô Urê luôn hiện ở bước SCr (tùy chọn).\n- Không cần chạy SQL mới. Bản iPhone cập nhật cùng lúc.",
+ "versionCode": 33,
+ "versionName": "0.26.1",
+ "apk": "https://github.com/thienphankh28-art/tdm-android-releases/releases/download/v0.26.1/tdm-amg-0.26.1.apk",
+ "sha256": "3dcf346afdaef122fa44d7c59bf2a45b65f1258f38513ac9aa61af701e17a6ac",
+ "size": 49748633,
+ "notes": "TDM AMG 0.26.1\n\n- Vancomycin: ô tuổi / chiều cao / cân nặng để trống hoặc không phải số -> không tính tiền nghiệm, Bayes và gợi ý liều, báo nhập đủ (trước đây phần mềm ngầm dùng 50 tuổi / 165 cm / 60 kg).\n- Gợi ý liều khởi đầu: liều nạp tối đa 3000 mg vẫn chưa đạt AUC0–24 đích -> báo rõ theo từng mô hình.\n- Chế độ tự nhập liều: khoảng đưa liều phải ≥ 4 h; thời gian truyền (nhập hoặc tự đặt) không dài hơn khoảng đưa liều; không nhận số âm; liều viết dạng «1,000» / «1.500» bị chặn kèm hướng dẫn (dấu phẩy/chấm là dấu thập phân). Khi tự nhập, các ô của phần gợi ý được làm mờ.\n- Nhãn liều nạp ngắn gọn hơn trên điện thoại. Giống bản máy tính Tab 4 V28.11.26e. Không cần chạy SQL mới. Bản iPhone cập nhật cùng lúc.",
  "required": false,
  "date": "2026-11-28"
 }
