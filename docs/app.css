@@ -53,6 +53,9 @@ button:disabled { opacity: .5; }
 .modal-btns { display: flex; gap: 8px; padding: 10px 16px 12px; border-top: 1px solid var(--border); }
 .mbtn { flex: 1; border: 0; border-radius: 8px; color: #fff; font-size: 15px; padding: 11px 6px; font-family: inherit; }
 @media (min-width: 600px) { .modal-ov { align-items: center; } .modal { border-radius: 14px; } }
+/* v0.26.0: hộp thoại toàn màn hình (Gợi ý liều khởi đầu) */
+.modal.full { height: 100vh; height: 100dvh; max-height: 100dvh; max-width: 760px; border-radius: 0; background: #F6F8FA; }
+.modal.full .modal-body { flex: 1; }
 
 /* v0.13.0: du doan AUC24h theo ngay (ma tran phac do + bang chi tiet) */
 .st-ok { background: #e3f3e8; color: #1a6b33; } .st-high { background: #fde8e8; color: #a4161a; } .st-low { background: #fff4d6; color: #8a5a00; }

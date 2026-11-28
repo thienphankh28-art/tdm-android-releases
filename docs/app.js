@@ -549,6 +549,9 @@ class VancoState {
     this.scr = [ScrRow()]; this.doses = []; this.meas = [];
     this.newDose = '1000'; this.newTau = '12'; this.newTinf = '1'; this.target = '';
     this.result = null; this.newRes = null; this.history = null; this.selected = new Set();
+    // v0.26.0: Gợi ý liều khởi đầu (giống Tab 4 V28.11.26d) — trong VancoState nên tự reset khi mở BN khác
+    this.dhAuc = '500'; this.dhTau = ''; this.dhRound = ''; this.dhLd = ''; this.dhCustom = false;
+    this.cLd = ''; this.cLdTi = ''; this.cMd = ''; this.cMdTi = ''; this.cTau = '';
     const now = nowHourIso();
     this.doses.push(VDoseRow(now, '1000', '12')); this.doses.push(VDoseRow(isoPlusHours(now, 12), '1000', '12'));
     this.meas.push(VMeasRow('15', isoPlusHours(now, 13)));
@@ -1238,8 +1241,7 @@ const VancoSteps = {
   buildScr(p) {
     const vs = App.vs;
     ui.hint(p, 'Chọn đúng đơn vị SCr cho từng dòng — phần mềm quy đổi tự động sang mg/dL để tính toán.');
-    const useUre = (((App.vmeta.flags || {})[vs.method]) || []).includes('ure');
-    if (useUre) ui.hint(p, 'Komatsu 2025: nhập Urê (mmol/L) cùng lần xét nghiệm nếu có — mỗi lần TDM dùng urê gần thời điểm đo nhất.');
+    // v0.26.0: ô Urê luôn hiện (dùng cho Komatsu 2025 và Gợi ý liều khởi đầu)
     vs.scr.forEach((r, i) => {
       const c = ui.card(p, 10);
       const head = headRow(c, `Lần đo SCr thứ ${i + 1}`);
@@ -1248,7 +1250,8 @@ const VancoSteps = {
       ui.field(ui.cell(r1), 'SCr', r.value, (v) => { r.value = v; this.changed(); });
       ui.choice(ui.cell(r1), 'Đơn vị', ['μmol/L', 'mg/dL'], r.unit, (_, v) => { r.unit = v; this.changed(); });
       ui.dateTime(c, 'Thời điểm đo', r.at, (v) => { r.at = v; this.changed(); });
-      if (useUre) ui.field(c, 'Urê (mmol/L, tùy chọn — để trống: BUN 19,3 mg/dL)', r.ure || '', (v) => { r.ure = v.trim(); this.changed(); });
+      ui.field(c, 'Urê (mmol/L, tùy chọn)', r.ure || '', (v) => { r.ure = v.trim(); this.changed(); });
+      if (i === 0) ui.button(c, '💡 Gợi ý liều khởi đầu', Col.greenBtn, 10, () => doseHint(vs));
     });
     ui.button(p, '➕ Thêm lần đo SCr', Col.blue, 12, () => {
       const last = vs.scr[vs.scr.length - 1];
