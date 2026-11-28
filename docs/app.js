@@ -189,12 +189,7 @@ function page(title, sub, showNav) {
 function scrollToBottom() { setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 50); }
 
 // ================================================================== dang nhap
-const AppInfo = {
-  AUTHOR: 'Thiên Phan Tại', TITLE: 'Dược sĩ', YEAR: '2026', EMAIL: 'thienphankh28@gmail.com',
-  DISCLAIMER: 'Phần mềm là công cụ hỗ trợ tính toán, không thay thế đánh giá và quyết định lâm sàng của dược sĩ, bác sĩ. ' +
-    'Người sử dụng cần kiểm tra lại dữ liệu nhập và đối chiếu kết quả với tình trạng lâm sàng của người bệnh ' +
-    'trước khi áp dụng. Tác giả không chịu trách nhiệm đối với các quyết định điều trị dựa trên kết quả của phần mềm.',
-};
+// AppInfo (tác giả, chức danh, email bản quyền, miễn trừ trách nhiệm): xem appinfo.js — nạp trước app.js.
 
 // v0.17.0: ghi nho dang nhap tren may (SQL C4). KHONG luu mat khau: chi luu "ma ghi nho" ma hoa AES-GCM (Secure).
 let loginNotice = '';
